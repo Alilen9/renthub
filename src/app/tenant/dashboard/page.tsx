@@ -3,20 +3,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  FiHome,
-  FiMessageSquare,
-  FiSettings,
-  FiLogOut,
-  FiMap,
-  FiFilter,
-  FiKey,
-  FiCalendar,
-} from "react-icons/fi";
 import { listings } from "@/lib/mockData";
 import ListingCard from "@/components/landlord/ListingCard";
 import SearchFilters, { Filters } from "@/components/tenants/SearchFilters";
 import PropertyMap from "@/components/tenants/PropertyMap";
+import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 export default function TenantDashboard() {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
@@ -34,107 +25,19 @@ export default function TenantDashboard() {
 
   const router = useRouter();
 
-  const MOCK_ACTIVE_BOOKING_ID = "BKG12345";
-  const MOCK_LISTING_NAME = "Unit 4B - Riverwalk Lofts";
-
-  const handleMoveInConfirmation = () => {
-    router.push(`/tenant/lease-finalization/${MOCK_ACTIVE_BOOKING_ID}`);
-  };
-
-  const handleMessagesClick = () => {
-    router.push("/tenant/chat");
-  };
-
- const handleBookingClick = () => {
-  setActiveMenu("Booking"); // <-- ensures sidebar highlights this button
-  const encodedListing = encodeURIComponent(MOCK_LISTING_NAME);
-  router.push(`/tenant/booking-system?listing=${encodedListing}`);
-};
-
-
   const filteredListings = listings.filter((listing) => {
-    if (
-      filters.location &&
-      !listing.location.toLowerCase().includes(filters.location.toLowerCase())
-    ) {
-      return false;
-    }
+    if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
     const maxBudget = Number(filters.budget);
-    if (maxBudget > 0 && listing.price > maxBudget) {
-      return false;
-    }
-    if (filters.type && listing.type !== filters.type) {
-      return false;
-    }
-    if (filters.verifiedOnly && !listing.verified) {
-      return false;
-    }
+    if (maxBudget > 0 && listing.price > maxBudget) return false;
+    if (filters.type && listing.type !== filters.type) return false;
+    if (filters.verifiedOnly && !listing.verified) return false;
     return true;
   });
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md flex flex-col">
-        <div className="p-6 border-b">
-          <h1 className="text-2xl font-bold text-red-700">Tenant Portal</h1>
-        </div>
-        <nav className="flex-1 p-4 space-y-4">
-  <button
-    onClick={() => setActiveMenu("Dashboard")}
-    className={`flex items-center space-x-2 w-full p-2 rounded-lg ${
-      activeMenu === "Dashboard"
-        ? "bg-red-100 text-red-700 font-semibold"
-        : "hover:bg-gray-100 text-gray-700"
-    }`}
-  >
-    <FiHome /> <span>Dashboard</span>
-  </button>
-
-  <button
-    onClick={handleMoveInConfirmation}
-    className="flex items-center space-x-2 w-full p-2 rounded-lg bg-green-500 text-white font-bold hover:bg-green-600 transition-colors shadow-md"
-  >
-    <FiKey /> <span>Finalize Move-in</span>
-  </button>
-
-  <button
-  onClick={handleBookingClick}
-  className="flex items-center space-x-2 w-full p-2 rounded-lg bg-blue-500 text-white"
->
-  <FiCalendar /> <span>Book a Viewing</span>
-</button>
-
-
-  <button
-    onClick={handleMessagesClick}
-    className={`flex items-center space-x-2 w-full p-2 rounded-lg ${
-      activeMenu === "Messages"
-        ? "bg-red-100 text-red-700 font-semibold"
-        : "hover:bg-gray-100 text-gray-700"
-    }`}
-  >
-    <FiMessageSquare /> <span>Messages</span>
-  </button>
-
-  <button
-    onClick={() => setActiveMenu("Settings")}
-    className={`flex items-center space-x-2 w-full p-2 rounded-lg ${
-      activeMenu === "Settings"
-        ? "bg-red-100 text-red-700 font-semibold"
-        : "hover:bg-gray-100 text-gray-700"
-    }`}
-  >
-    <FiSettings /> <span>Settings</span>
-  </button>
-</nav>
-
-        <div className="p-4 border-t">
-          <button className="flex items-center space-x-2 w-full p-2 rounded-lg hover:bg-gray-100 text-gray-600">
-            <FiLogOut /> <span>Logout</span>
-          </button>
-        </div>
-      </aside>
+      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
@@ -153,7 +56,7 @@ export default function TenantDashboard() {
                   }`}
                   aria-expanded={showFilterDropdown}
                 >
-                  <FiFilter /> <span>Filters</span>
+                  <span>Filters</span>
                 </button>
 
                 {showFilterDropdown && (
@@ -169,7 +72,6 @@ export default function TenantDashboard() {
                           : "bg-red-600 text-white hover:bg-red-700"
                       }`}
                     >
-                      <FiMap className="mr-2" />
                       {showMap ? "Hide Map View" : "Show Map View"}
                     </button>
                   </div>
@@ -210,9 +112,7 @@ export default function TenantDashboard() {
                 </div>
               )}
 
-              <h3 className="text-lg font-semibold mt-6 mb-4">
-                Available Properties
-              </h3>
+              <h3 className="text-lg font-semibold mt-6 mb-4">Available Properties</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredListings.map((listing) => (
                   <ListingCard
@@ -230,9 +130,7 @@ export default function TenantDashboard() {
                   />
                 ))}
                 {filteredListings.length === 0 && (
-                  <p className="text-gray-600">
-                    No listings match your filters.
-                  </p>
+                  <p className="text-gray-600">No listings match your filters.</p>
                 )}
               </div>
             </>
@@ -261,9 +159,7 @@ export default function TenantDashboard() {
               Ksh {selectedListing.price.toLocaleString()}
             </p>
             <button
-              onClick={() =>
-                router.push(`/tenant/listing/${selectedListing.id}`)
-              }
+              onClick={() => router.push(`/tenant/listing/${selectedListing.id}`)}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Explore
@@ -282,9 +178,7 @@ export default function TenantDashboard() {
       {showAnalyticsModal && selectedListing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <h2 className="text-xl font-bold mb-4">
-              Analytics: {selectedListing.title}
-            </h2>
+            <h2 className="text-xl font-bold mb-4">Analytics: {selectedListing.title}</h2>
             <p className="text-gray-600">📊 Views: 120</p>
             <p className="text-gray-600">⭐ Interested: 45</p>
             <p className="text-gray-600">✅ Applications: 10</p>
