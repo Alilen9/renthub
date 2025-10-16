@@ -21,7 +21,7 @@ export default function LoginForm({
 
     // TODO: Replace with real login API
     if (role === "landlord") {
-      router.push("/dashboard/landlord");
+      router.push("/landlord/dashboard");
     } else {
       router.push("/tenant/dashboard"); // or homepage if you don’t have tenant dashboard yet
     }
