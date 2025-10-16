@@ -46,7 +46,7 @@ export default function DashboardMain({
                 location={listing.county as string}
                 files={listing.files as ListingFile[]}
                 onDelete={() => handleDelete(idx)} // ✅ pass delete handler
-              />
+                description={""}              />
             ))
           ) : (
             <div className="col-span-3 border rounded p-6 text-center text-gray-500">

@@ -1,57 +1,55 @@
 "use client";
 
-import { Listing } from "@/lib/mockData";
+import React from "react";
+import { ListingFile } from "./types";
 
-interface ListingCardProps {
-  listing: Listing;
-  onView?: () => void;
-  onAnalytics?: () => void;
+export interface ListingCardProps {
+  title: string;
+  description: string;
+  price: number;
+  location: string;
+  files: ListingFile[];
   onDelete?: () => void;
 }
 
-export default function ListingCard({ listing, onView, onAnalytics, onDelete }: ListingCardProps) {
-  const { title, price, location, images } = listing;
+export default function ListingCard({
+  title,
+  description,
+  price,
+  location,
+  files,
+  onDelete,
+}: ListingCardProps) {
+  const previewImage =
+    files && files.length > 0
+      ? (files[0] as any).previewUrl || (files[0] as any).url
+      : "/placeholder.jpg";
 
   return (
-    <div className="col-span-1 border rounded-lg shadow-sm p-3 bg-white transition hover:shadow-md">
-      {/* Media Preview */}
-      <div className="h-40 bg-gray-100 rounded mb-3 flex items-center justify-center overflow-hidden">
-        {images?.length ? (
-          <img
-            src={images[0]}
-            alt={title}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="text-gray-400">No media</span>
-        )}
-      </div>
+    <div className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
+      <img
+        src={previewImage}
+        alt={title}
+        className="w-full h-40 object-cover"
+      />
+      <div className="p-4">
+        <h2 className="text-lg font-semibold text-black">{title}</h2>
+        <p className="text-gray-600 text-sm">{location}</p>
+        <p className="text-rose-600 font-semibold mt-2">Ksh {price}</p>
 
-      {/* Info */}
-      <div className="font-semibold text-black">{title}</div>
-      <div className="text-sm text-gray-500">Ksh {price.toLocaleString()}</div>
-      <div className="text-sm text-gray-600">{location}</div>
-
-      {/* Actions */}
-      <div className="mt-3 flex gap-2">
-        <button
-          onClick={onView}
-          className="text-black px-3 py-1 border rounded hover:bg-red-100"
-        >
-          View
-        </button>
-        <button
-          onClick={onAnalytics}
-          className="text-black px-3 py-1 border rounded hover:bg-red-100"
-        >
-          Analytics
-        </button>
-        <button
-          onClick={onDelete}
-          className="text-sm px-3 py-1 border rounded text-red-600 hover:bg-red-100"
-        >
-          Clear
-        </button>
+        <div className="flex justify-between items-center mt-4">
+          <button className="text-sm text-gray-500 hover:text-gray-700">
+            View
+          </button>
+          {onDelete && (
+            <button
+              onClick={onDelete}
+              className="text-sm text-rose-600 hover:text-rose-800"
+            >
+              Delete
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
