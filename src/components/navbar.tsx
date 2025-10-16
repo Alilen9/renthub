@@ -1,26 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from 'next/link';
 import AuthModal from "./auth/authmodal";
-
 
 export default function Navbar() {
   const [authOpen, setAuthOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Set to true if scrolled more than 10px, for example
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup function to remove the event listener
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md shadow-sm z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-indigo-600">LetHub</h1>
-          <button
-            onClick={() => setAuthOpen(true)}
-            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'}`}>
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          <Link href="/" className="text-2xl font-bold">
+            <span className={isScrolled ? 'text-gray-800' : 'text-white'}>RentHub</span>
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6">
+            <Link
+              href="/tenant"
+              className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}
+            >
+              For Tenants
+            </Link>
+            <Link
+              href="/landlord"
+              className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}
+            >
+              For Landlords
+            </Link>
+            <Link
+              href="/about"
+              className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}
+            >
+              About Us
+            </Link>
+          </nav>
+          <button onClick={() => setAuthOpen(true)}
+            className="button-primary"
           >
             Login / Sign Up
           </button>
         </div>
-      </nav>
-
+      </header>
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
