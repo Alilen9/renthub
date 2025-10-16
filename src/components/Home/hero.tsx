@@ -30,7 +30,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative h-[80vh] flex items-center justify-center text-center text-white overflow-hidden">
+    <section className="relative h-screen flex items-center justify-center text-center text-white overflow-hidden">
       {/* Rotating background */}
       {cityImages.map((city, i) => (
         <div
