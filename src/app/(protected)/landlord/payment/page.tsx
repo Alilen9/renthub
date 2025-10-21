@@ -1,12 +1,11 @@
 "use client";
 
+import ListingDetailsForm from "@/components/landlord/ListingDetailsForm";
+import ListingMediaSection from "@/components/landlord/ListingMediaSection";
+import { ListingDraft } from "@/components/landlord/types";
+import Modal from "@/components/ui/Modal";
+import PaymentModal from "@/components/ui/paymentmodel";
 import { useState } from "react";
-import Modal from "../ui/Modal";
-import Button from "../ui/Button";
-import { ListingDraft } from "./types";
-import ListingDetailsForm from "./ListingDetailsForm";
-import ListingMediaSection from "./ListingMediaSection";
-import PaymentModal from "../ui/paymentmodel";
 
 
 export default function CreateListingModal({

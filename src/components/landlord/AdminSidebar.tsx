@@ -1,38 +1,41 @@
-'use client';
+// src/components/landlord/Sidebar.tsx
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
-const sidebarNavItems = [
-    { href: '/admin', label: 'Dashboard' },
-    { href: '/admin/properties', label: 'Properties' },
-    { href: '/admin/tenants', label: 'Tenants' },
-    { href: '/admin/payments', label: 'Payments' },
-    { href: '/admin/settings', label: 'Settings' },
-];
+import React from "react";
+import Link from "next/link";
+import { Home, PlusCircle, LogOut } from "lucide-react";
 
 export default function Sidebar() {
-    const pathname = usePathname();
+  const sidebarNavItems = [
+    { href: "/landlord/dashboard", label: "Dashboard" },
+     { href: "/landlord/add-listing", label: "Add Listing" },
 
-    return (
-        <aside className="w-64 flex-shrink-0 bg-gray-800 text-white p-4 hidden md:block">
-            <div className="text-2xl font-bold mb-8">RentHub Admin</div>
-            <nav>
-                <ul>
-                    {sidebarNavItems.map((item) => (
-                        <li key={item.href} className="mb-2">
-                            <Link
-                                href={item.href}
-                                className={`block p-2 rounded hover:bg-gray-700 ${
-                                    pathname === item.href ? 'bg-gray-900' : ''
-                                }`}
-                            >
-                                {item.label}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </nav>
-        </aside>
-    );
+    { href: "/landlord/dashboard/properties", label: "Properties" },
+    { href: "/landlord/dashboard/tenants", label: "Tenants" },
+    { href: "/landlord/dashboard/payments", label: "Payments" },
+    { href: "/landlord/dashboard/settings", label: "Settings" },
+  ];
+
+  return (
+    <aside className="col-span-3 bg-white h-screen shadow-md p-6 flex flex-col justify-between">
+      <div>
+        <h2 className="text-2xl font-bold text-rose-600 mb-8"> RentHub</h2>
+        <nav className="space-y-4 text-gray-700">
+          {sidebarNavItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-2 hover:text-rose-600"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      <button className="flex items-center gap-2 text-gray-600 hover:text-red-600">
+        <LogOut size={18} /> Logout
+      </button>
+    </aside>
+  );
 }

@@ -27,12 +27,7 @@ export default function DashboardMain({
       <section className="bg-white p-6 rounded-2xl shadow-sm">
         <header className="flex items-center justify-between">
           <h1 className="text-black font-semibold">My Listings</h1>
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="px-4 py-2 text-sm bg-rose-600 text-white rounded-lg hover:bg-rose-700"
-          >
-            + Add Listing
-          </button>
+         
         </header>
 
         {/* Listings Grid */}
