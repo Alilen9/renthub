@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { registerUser } from "@/services/authService";
+import { RegisterFormData } from "@/utils/auth";
+import { toast } from "react-hot-toast";
 
 export default function SignupForm({
   onLogin,
@@ -11,20 +14,47 @@ export default function SignupForm({
 }) {
   const [role, setRole] = useState<"tenant" | "landlord">("tenant");
   const [kycStep, setKycStep] = useState<0 | 1 | 2 | 3>(0);
+  const [formData, setFormData] = useState<RegisterFormData>({
+    full_name: "",
+    email: "",
+    password: "",
+    phone: "",
+    username: "", // will be set to email
+  });
   const [preview, setPreview] = useState<string | null>(null);
   const [useCamera, setUseCamera] = useState(false);
   const [underReview, setUnderReview] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+
     if (role === "landlord") {
+      // For landlords, we first gather info, then proceed to KYC
       setKycStep(1); // Start KYC flow
+      setIsLoading(false);
     } else {
-      onSuccess(); // Tenants go straight to success
+      // For tenants, we register them directly
+      try {
+        await registerUser({ ...formData, username: formData.email }, 'tenant');
+        toast.success("Account created! Please log in.");
+        onSuccess(); // Show success message and switch to login view
+      } catch (err: any) {
+        toast.error(err.message || "An unexpected error occurred.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
+
 
   // File upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +73,7 @@ export default function SignupForm({
         videoRef.current.srcObject = stream;
       }
     } catch (err) {
-      alert("Camera access denied or not available.");
+      toast.error("Camera access denied or not available.");
       setUseCamera(false);
     }
   };
@@ -204,30 +234,40 @@ export default function SignupForm({
   return (
     <form onSubmit={handleSignup} className="space-y-4">
       <h2 className="text-xl font-semibold text-black">Create Account</h2>
-
       <input
         type="text"
-        placeholder="First Name"
-        className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
-      />
-      <input
-        type="text"
-        placeholder="Last Name"
+        name="full_name"
+        placeholder="Full Name"
+        value={formData.full_name}
+        onChange={handleInputChange}
+        required
         className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
       />
       <input
         type="email"
+        name="email"
         placeholder="Email"
+        value={formData.email}
+        onChange={handleInputChange}
+        required
         className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
       />
       <input
         type="tel"
+        name="phone"
         placeholder="Phone Number"
+        value={formData.phone}
+        onChange={handleInputChange}
         className="w-full px-4 py-2 border border-black text-black rounded-lg"
       />
       <input
         type="password"
+        name="password"
         placeholder="Password"
+        value={formData.password}
+        onChange={handleInputChange}
+        required
+        minLength={6}
         className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
       />
 
@@ -238,7 +278,7 @@ export default function SignupForm({
             type="radio"
             value="tenant"
             checked={role === "tenant"}
-            onChange={() => setRole("tenant")}
+            onChange={(e) => setRole(e.target.value as "tenant" | "landlord")}
           />
           Tenant
         </label>
@@ -247,14 +287,18 @@ export default function SignupForm({
             type="radio"
             value="landlord"
             checked={role === "landlord"}
-            onChange={() => setRole("landlord")}
+            onChange={(e) => setRole(e.target.value as "tenant" | "landlord")}
           />
           Landlord
         </label>
       </div>
 
-      <button className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-        Create Account
+      <button
+        type="submit"
+        disabled={isLoading}
+        className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-indigo-400"
+      >
+        {isLoading ? 'Creating...' : (role === 'tenant' ? 'Create Account' : 'Continue to Verification')}
       </button>
 
       <p className="text-sm text-center text-black">

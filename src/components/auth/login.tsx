@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { loginUser } from "@/services/authService";
+import { toast } from "react-hot-toast";
 
 export default function LoginForm({
   onForgot,
@@ -13,40 +15,59 @@ export default function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"tenant" | "landlord">("tenant");
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error("Email and password are required.");
+      return;
+    }
+    setIsLoading(true);
+    
 
-    // TODO: Replace with real login API
-    if (role === "landlord") {
-      router.push("/landlord/dashboard");
-    } else {
-      router.push("/tenant/dashboard"); // or homepage if you don’t have tenant dashboard yet
+    try {
+      const data = await loginUser({ email, password }, role);
+      toast.success('Logged in successfully!');
+
+      // Store the token (e.g., in localStorage)
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // Redirect to the appropriate dashboard
+      router.push(`/${role}/dashboard`);
+
+      // You might want to close the modal after successful login
+      // This depends on your desired UX. You could call a prop like `onSuccess`
+      // which would then call `onClose` in the parent `AuthModal`.
+    } catch (err: any) {
+      toast.error(err.message || "An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <h2 className="text-xl font-semibold text-black">Login</h2>
-
       <input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        required
         className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
       />
-
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        required
         className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
       />
-
       {/* Role selection */}
       <div className="flex gap-4 text-black">
         <label className="flex items-center gap-2">
@@ -54,7 +75,7 @@ export default function LoginForm({
             type="radio"
             value="tenant"
             checked={role === "tenant"}
-            onChange={() => setRole("tenant")}
+            onChange={(e) => setRole(e.target.value as "tenant" | "landlord")}
           />
           Tenant
         </label>
@@ -63,19 +84,18 @@ export default function LoginForm({
             type="radio"
             value="landlord"
             checked={role === "landlord"}
-            onChange={() => setRole("landlord")}
+            onChange={(e) => setRole(e.target.value as "tenant" | "landlord")}
           />
           Landlord
         </label>
       </div>
-
       <button
         type="submit"
-        className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        disabled={isLoading}
+        className="w-full button-primary py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-indigo-400 disabled:cursor-not-allowed"
       >
-        Login
+        {isLoading ? 'Logging in...' : 'Login'}
       </button>
-
       <div className="flex justify-between text-sm">
         <button
           type="button"

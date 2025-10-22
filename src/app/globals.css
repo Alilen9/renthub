@@ -33,3 +33,6 @@ body {
   border-radius: 5px;
   cursor: pointer;
 }
+.button-primary:hover {
+  background-color: #2a00cc;
+}
