@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import CreateListingModal from "@/components/landlord/CreateListingModal";
 import { ListingDraft } from "@/components/landlord/types";
+import CreateListingModal from "../(protected)/landlord/payment/page";
 
 export default function CreateListingPage() {
   const [open, setOpen] = useState(true);

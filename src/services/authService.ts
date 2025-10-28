@@ -1,5 +1,5 @@
-import { ResetPasswordResponse } from './../utils/auth';
-import { LoginSuccessResponse, RegisterFormData, RegisterSuccessResponse, LoginCredentials } from "@/utils/auth";
+import { ResetPasswordResponse, ChangePasswordData, RegisterSuccessResponse } from './../utils/auth';
+import { LoginSuccessResponse, RegisterFormData, LoginCredentials } from "@/utils/auth";
 import { apiFetch } from '@/services/api';
 
 export const loginUser = async (credentials: LoginCredentials, role: 'tenant' | 'landlord'): Promise<LoginSuccessResponse> => {
@@ -76,4 +76,18 @@ export const resetPassword = async (
     method: 'POST',
     body: JSON.stringify(payload),
   }, false);
+};
+
+/**
+ * Sends a request to update the current user's password.
+ * @param payload The current and new password.
+ * @returns A promise that resolves with the success message from the server.
+ */
+export const updatePassword = async (
+  payload: ChangePasswordData
+): Promise<RegisterSuccessResponse> => {
+  return apiFetch<RegisterSuccessResponse>('/api/auth/update-password', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 };

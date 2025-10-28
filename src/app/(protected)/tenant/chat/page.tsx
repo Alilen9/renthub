@@ -11,102 +11,7 @@ import {
   FiCalendar,
 } from "react-icons/fi";
 
-// 🎨 Tunyce Colors
-const colors = {
-  maroon: "#58181C",
-  red: "#C81E1E",
-  yellow: "#F4C542",
-};
 
-// --- Sidebar ---
-function TenantSidebar({
-  activeMenu,
-  setActiveMenu,
-}: {
-  activeMenu: string;
-  setActiveMenu: (menu: string) => void;
-}) {
-  const router = useRouter();
-
-  const goTo = (path: string, menu: string) => {
-    setActiveMenu(menu);
-    router.push(path);
-  };
-
-  return (
-    <aside
-      className="w-64 min-h-screen flex flex-col shadow-lg"
-      style={{ backgroundColor: colors.maroon }}
-    >
-      <div className="p-6 border-b border-[#C81E1E]/50">
-        <h1 className="text-2xl font-bold" style={{ color: colors.yellow }}>
-            RentHub
-        </h1>
-        <p className="text-sm text-gray-300 mt-1">Your Rental Dashboard</p>
-      </div>
-
-      <nav className="flex-1 p-4 space-y-3">
-        <button
-          onClick={() => goTo("/tenant/dashboard", "Dashboard")}
-          className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition ${
-            activeMenu === "Dashboard"
-              ? "bg-[#C81E1E] text-white shadow-md"
-              : "text-gray-200 hover:bg-[#C81E1E]/80"
-          }`}
-        >
-          <FiHome /> <span>Dashboard</span>
-        </button>
-
-        <button
-          onClick={() =>
-            router.push(`/tenant/lease-finalization/BKG12345`)
-          }
-          className="flex items-center gap-3 w-full p-3 rounded-lg font-medium bg-[#F4C542] text-[#58181C] hover:bg-[#F4C542]/90 transition shadow-md"
-        >
-          <FiKey /> <span>Finalize Move-in</span>
-        </button>
-
-        <button
-          onClick={() => goTo("/tenant/booking-system", "Booking")}
-          className="flex items-center gap-3 w-full p-3 rounded-lg font-medium bg-[#C81E1E]/90 text-white hover:bg-[#C81E1E] transition shadow-md"
-        >
-          <FiCalendar /> <span>Book a Viewing</span>
-        </button>
-
-        <button
-          onClick={() => goTo("/tenant/chat", "Messages")}
-          className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition ${
-            activeMenu === "Messages"
-              ? "bg-[#C81E1E] text-white shadow-md"
-              : "text-gray-200 hover:bg-[#C81E1E]/80"
-          }`}
-        >
-          <FiMessageSquare /> <span>Messages</span>
-        </button>
-
-        <button
-          onClick={() => goTo("/tenant/settings", "Settings")}
-          className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition ${
-            activeMenu === "Settings"
-              ? "bg-[#C81E1E] text-white shadow-md"
-              : "text-gray-200 hover:bg-[#C81E1E]/80"
-          }`}
-        >
-          <FiSettings /> <span>Settings</span>
-        </button>
-      </nav>
-
-      <div className="p-4 border-t border-[#C81E1E]/50">
-        <button
-          className="flex items-center gap-3 w-full p-3 rounded-lg text-gray-300 hover:bg-[#C81E1E]/70 hover:text-white transition"
-          onClick={() => router.push("/")}
-        >
-          <FiLogOut /> <span>Logout</span>
-        </button>
-      </div>
-    </aside>
-  );
-}
 
 // --- Mock Chat Data ---
 const initialChatData = [
@@ -367,9 +272,7 @@ export default function TenantChatPage() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
-
+    
       {/* Main Chat Area */}
       <main className="flex-1 flex flex-col">
         <ChatPanelHeader

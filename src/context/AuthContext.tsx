@@ -60,13 +60,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     try {
       const data = role === 'admin'
-        ? await loginAdmin(credentials.email, credentials.password)
-        : await loginUser(credentials.email, credentials.password, role);
+        ? await loginAdmin(credentials)
+        : await loginUser(credentials, role);
       const userData = data.user;
       if (!userData) {
         return { success: false, error: 'Login successful, but no user data received.' };
       }
       setSession(data.token, userData, role);
+      console.log(userData)
 
       if (redirectUrl && redirectUrl.startsWith('/')) {
         router.push(redirectUrl);
@@ -76,11 +77,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             router.push('/admin/dashboard');
             break;
           case 'landlord':
-            router.push('/seller/dashboard');
+            router.push('/landlord/dashboard');
             break;
           case 'tenant':
           default:
-            router.push('/dashboard');
+            router.push('/tenant/dashboard');
             break;
         }
       }
@@ -121,11 +122,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUser(null);
     
-    let loginPath = '/auth/buyer/login';
+    let loginPath = '/';
     if (role === 'landlord') {
-      loginPath = '/auth/seller/login';
+      loginPath = '/';
     } else if (role === 'admin') {
-      loginPath = '/auth/admin/login';
+      loginPath = '/';
     }
     router.push(loginPath);
   };

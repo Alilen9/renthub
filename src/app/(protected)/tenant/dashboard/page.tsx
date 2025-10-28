@@ -1,16 +1,19 @@
 // src/app/tenant/TenantDashboard.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { listings } from "@/lib/mockData";
 import ListingCard from "@/components/landlord/ListingCard";
 import SearchFilters, { Filters } from "@/components/tenants/SearchFilters";
 import PropertyMap from "@/components/tenants/PropertyMap";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
+import { useAuth } from "@/context/AuthContext";
+import { fetchApartments } from "@/services/houseService";
+import { Apartment } from "@/utils";
+import { Search } from "lucide-react";
 
 export default function TenantDashboard() {
-  const [activeMenu, setActiveMenu] = useState("Dashboard");
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [selectedListing, setSelectedListing] = useState<any>(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
@@ -25,6 +28,20 @@ export default function TenantDashboard() {
 
   const router = useRouter();
 
+  const [apartments, setApartments] = useState<Apartment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      async function loadApartments() {
+          setLoading(true);
+          // Fetch the first 3 apartments for the "featured" section
+          const data = await fetchApartments(3);
+          setApartments(data);
+          setLoading(false);
+      }
+      loadApartments();
+  }, []);
+
   const filteredListings = listings.filter((listing) => {
     if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
     const maxBudget = Number(filters.budget);
@@ -35,17 +52,32 @@ export default function TenantDashboard() {
   });
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+    <div className="flex min-h-screen">
+      
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Navbar */}
-        <header className="flex justify-between items-center bg-white px-6 py-4 shadow-sm relative z-10">
-          <h2 className="text-xl font-semibold">{activeMenu}</h2>
+        <header className="flex justify-between items-center bg-white px-6 py-4 shadow-sm relative ">
+          
+            <div className="relative w-full max-w-xs">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    placeholder="Search by name or area"
+                    // value={searchTerm}
+                    // onChange={(e) => {
+                    //     setSearchTerm(e.target.value);
+                    //     setCurrentPage(1); // Reset page on search
+                    // }}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+            </div>
+         
           <div className="flex items-center space-x-3">
-            {activeMenu === "Dashboard" && (
+            
               <div className="relative">
                 <button
                   onClick={() => setShowFilterDropdown(!showFilterDropdown)}
@@ -60,7 +92,7 @@ export default function TenantDashboard() {
                 </button>
 
                 {showFilterDropdown && (
-                  <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white border border-gray-200 rounded-lg shadow-xl p-4">
+                  <div className="right-0 mt-2 w-80 md:w-96 bg-white border border-gray-200 rounded-lg shadow-xl p-4">
                     <div className="mb-4">
                       <SearchFilters onChange={setFilters} />
                     </div>
@@ -77,19 +109,14 @@ export default function TenantDashboard() {
                   </div>
                 )}
               </div>
-            )}
-            <img
-              src="https://randomuser.me/api/portraits/women/68.jpg"
-              alt="avatar"
-              className="w-10 h-10 rounded-full"
-            />
-            <span className="font-medium">Alice Tenant</span>
+            
+            
           </div>
         </header>
 
         {/* Dashboard Content */}
         <main className="p-6 flex-1 overflow-y-auto">
-          {activeMenu === "Dashboard" && (
+          
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-lg shadow">
@@ -112,35 +139,32 @@ export default function TenantDashboard() {
                 </div>
               )}
 
-              <h3 className="text-lg font-semibold mt-6 mb-4">Available Properties</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredListings.map((listing) => (
-                  <ListingCard
-                    key={listing.id}
-                    listing={listing}
-                    onView={() => {
-                      setSelectedListing(listing);
-                      setShowViewModal(true);
-                    }}
-                    onAnalytics={() => {
-                      setSelectedListing(listing);
-                      setShowAnalyticsModal(true);
-                    }}
-                    onDelete={() => alert("Delete disabled for tenants")}
-                  />
-                ))}
-                {filteredListings.length === 0 && (
-                  <p className="text-gray-600">No listings match your filters.</p>
+                
+                {loading ? (
+                    <p className="text-center text-gray-600">Loading apartments...</p>
+                ) : apartments.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <h3 className="text-lg font-semibold mt-6 mb-4">Available Properties</h3>
+              
+                        {apartments.map((apartment) => (
+                            <ListingCard
+                             key={apartment.id}
+                              apartment={apartment} />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-600">No featured apartments available at the moment.</p>
                 )}
               </div>
             </>
-          )}
+          
 
-          {activeMenu === "Settings" && (
+          
             <div className="bg-white p-6 rounded-lg shadow text-gray-600">
               ⚙️ Settings will be added soon...
             </div>
-          )}
+          
         </main>
       </div>
 

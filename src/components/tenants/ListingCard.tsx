@@ -2,8 +2,26 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Listing } from "@/lib/mockData";
+import { useEffect, useState } from "react";
+import { fetchApartments } from "@/services/houseService";
+import { Apartment } from "@/utils";
 
 export default function ListingCard({ listing }: { listing: Listing }) {
+  
+  const [apartments, setApartments] = useState<Apartment[]>([]);
+      const [loading, setLoading] = useState(true);
+  
+      useEffect(() => {
+          async function loadApartments() {
+              setLoading(true);
+              // Fetch the first 3 apartments for the "featured" section
+              const data = await fetchApartments(3);
+              setApartments(data);
+              setLoading(false);
+          }
+          loadApartments();
+      }, []);
+      
   return (
     <div className="border rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden bg-white">
       {/* Property Image */}

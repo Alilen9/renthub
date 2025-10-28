@@ -31,6 +31,7 @@ export interface ApiUser extends Partial<User> {
 }
 
 export interface LoginSuccessResponse {
+  error?: string;
   success: true;
   token: string;
   user: ApiUser;

@@ -1,5 +1,6 @@
 
 
+import FeaturedApartments from "@/components/Home/FeaturedApartments";
 import FeatureHighlights from "@/components/Home/Featurehighlights";
 import Hero from "@/components/Home/hero";
 
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Navbar />
       <Hero />
       <FeatureHighlights />
+      <FeaturedApartments />
     </main>
   );
 }

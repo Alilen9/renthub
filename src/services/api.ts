@@ -1,4 +1,5 @@
-import { getAuthToken } from './authHelper';
+import { getAuthToken } from '@/utils/authHelper';
+import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -8,13 +9,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
  * @returns The path to the login page.
  */
 const getLoginPath = (endpoint: string): string => {
-    if (endpoint.includes('/seller')) {
-        return '/auth/seller/login';
+    if (endpoint.includes('/landlord')) {
+        return '/auth/landlord/login';
     }
     if (endpoint.includes('/admin')) {
         return '/admin/login';
     }
-    return '/login'; // Default for buyers
+    return '/'; // Default for buyers
 };
 
 /**
@@ -57,10 +58,20 @@ export const apiFetch = async <T>(
         if (!response.ok || (data && data.success === false)) {
             const errorMessage = data.error || data.message || `Request failed with status ${response.status}`;
 
-            if (errorMessage.includes('Invalid or expired token') || errorMessage.includes('Invaid or expired token')) {
+            // Check for various token-related error messages
+            const isAuthError = ['Invalid or expired token', 'Invaid or expired token', 'Not authorized, token failed', 'Request failed with status 401: Unauthorized'].some(
+                (msg) => errorMessage.includes(msg)
+            );
+
+            if (isAuthError) {
                 if (typeof window !== 'undefined') {
-                    window.location.href = getLoginPath(endpoint);
-                    throw new Error('Authentication error. Redirecting to login...');
+                    toast.error("Your session has expired. Please log in again.");
+                    // Redirect to homepage after a short delay to allow the user to see the toast.
+                    setTimeout(() => {
+                        sessionStorage.clear(); // Clear session storage
+                        window.location.href = '/'; // Redirect to homepage
+                    }, 2000);
+                    throw new Error('Authentication error. Redirecting...');
                 }
             }
             throw new Error(errorMessage);

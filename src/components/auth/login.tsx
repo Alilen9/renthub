@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/services/authService";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginForm({
   onForgot,
@@ -16,6 +16,7 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"tenant" | "landlord">("tenant");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const router = useRouter();
 
@@ -29,19 +30,16 @@ export default function LoginForm({
     
 
     try {
-      const data = await loginUser({ email, password }, role);
-      toast.success('Logged in successfully!');
+      const result = await login({ email, password }, role);
 
-      // Store the token (e.g., in localStorage)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      if (result.error) {
+        toast.error(result.error || 'Login failed. Please check your credentials.');
+      } else {
+        toast.success('Login successful!');
+      }
 
-      // Redirect to the appropriate dashboard
-      router.push(`/${role}/dashboard`);
+      console.log("Login result", result)
 
-      // You might want to close the modal after successful login
-      // This depends on your desired UX. You could call a prop like `onSuccess`
-      // which would then call `onClose` in the parent `AuthModal`.
     } catch (err: any) {
       toast.error(err.message || "An unexpected error occurred.");
     } finally {

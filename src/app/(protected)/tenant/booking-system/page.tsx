@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BookingReview from "@/components/tenants/BookingReview";
 import BookingCalendar from "@/components/tenants/BookingCalendar";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 
 // --- Helper Component: Payment Placeholder (STEP 3) ---
@@ -228,8 +227,6 @@ export default function BookingPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 
       {/* Main Booking Area */}
       <main className="flex-1 overflow-y-auto p-6">
