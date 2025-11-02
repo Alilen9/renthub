@@ -14,7 +14,6 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
-
     // Cleanup function to remove the event listener
     return () => {
       window.removeEventListener("scroll", handleScroll);
