@@ -1,14 +1,19 @@
 // src/components/landlord/types.ts
 
+// src/components/landlord/types.ts
+
 export type ListingFile = {
   id?: string;          // present if file is saved on server
   url?: string;         // server URL after upload
   previewUrl?: string;  // local preview before upload
   name: string;
-  type: string;
+  type: "image" | "video" | "360"; // ✅ restrict to valid media types
+  size?: number;
 };
 
+
 export type ListingDraft = {
+  id?: string; 
   county: string | number | readonly string[] | undefined;
   type: string | number | readonly string[] | undefined;
   files: (File | ListingFile)[];  // ✅ unified here

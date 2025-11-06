@@ -8,12 +8,11 @@ import { Home, PlusCircle, LogOut } from "lucide-react";
 export default function Sidebar() {
   const sidebarNavItems = [
     { href: "/landlord/dashboard", label: "Dashboard" },
-     { href: "/landlord/add-listing", label: "Add Listing" },
-
-    { href: "/landlord/dashboard/properties", label: "Properties" },
-    { href: "/landlord/dashboard/tenants", label: "Tenants" },
-    { href: "/landlord/dashboard/payments", label: "Payments" },
-    { href: "/landlord/dashboard/settings", label: "Settings" },
+    
+    { href: "/landlord/property", label: "Properties" },
+   { href: "/landlord/tenants", label: "Tenants" },
+    { href: "/landlord/payment", label: "Payments" },
+    { href: "/landlord/settings", label: "Settings" },
   ];
 
   return (
