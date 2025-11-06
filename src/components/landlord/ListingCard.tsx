@@ -67,7 +67,7 @@ export default function ListingCard({
 
         <div className="flex justify-between items-center mt-3">
           <span className="text-rose-600 font-semibold">
-            Ksh {price.toLocaleString()}
+            Ksh {price?.toLocaleString()}
           </span>
           <span className="text-gray-500 text-sm">{location}</span>
         </div>
