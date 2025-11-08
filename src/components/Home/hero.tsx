@@ -47,20 +47,6 @@ export default function LandingPage() {
   return (
     <div className="relative font-sans">
 
-      {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold text-rose-600">RentHub</Link>
-          <nav className="hidden md:flex items-center space-x-6 text-black font-medium">
-            <a href="#home" className="hover:text-rose-600 transition">Home</a>
-            <a href="#properties" className="hover:text-rose-600 transition">Properties</a>
-            <a href="#services" className="hover:text-rose-600 transition">Services</a>
-            <a href="#about" className="hover:text-rose-600 transition">About</a>
-            <a href="#contact" className="hover:text-rose-600 transition">Contact</a>
-          </nav>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <section id="home" className="relative h-screen flex items-center justify-center text-center text-white overflow-hidden">
         {cityImages.map((city, i) => (
