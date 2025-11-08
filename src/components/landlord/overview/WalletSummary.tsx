@@ -13,7 +13,7 @@ export default function WalletSummary() {
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-200">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">💰 Wallet Summary</h2>
+      <h2 className="text-lg font-semibold mb-4 text-gray-800"> Wallet Summary</h2>
 
       <div className="grid grid-cols-1 gap-2 text-sm">
         <div className="flex justify-between border-b pb-2">
