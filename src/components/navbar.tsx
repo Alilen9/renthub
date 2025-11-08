@@ -24,21 +24,38 @@ export default function Navbar() {
           </Link>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 z-50">
-            
-            <Link href="#about" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
-              About Us
-            </Link>
-            <Link href="#properties" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
-              Contact Us
-            </Link>
-            <Link href="#services" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
-              Contact Us
-            </Link>
-            <Link href="#contact" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
-              Contact Us
-            </Link>
-          </nav>
+<nav className="hidden md:flex items-center space-x-6 font-medium z-50">
+  <Link
+    href="#home"
+    className={`${isScrolled ? 'text-gray-700' : 'text-white'} hover:text-rose-600 transition`}
+  >
+    Home
+  </Link>
+  <Link
+    href="#properties"
+    className={`${isScrolled ? 'text-gray-700' : 'text-white'} hover:text-rose-600 transition`}
+  >
+    Properties
+  </Link>
+  <Link
+    href="#services"
+    className={`${isScrolled ? 'text-gray-700' : 'text-white'} hover:text-rose-600 transition`}
+  >
+    Services
+  </Link>
+  <Link
+    href="#about"
+    className={`${isScrolled ? 'text-gray-700' : 'text-white'} hover:text-rose-600 transition`}
+  >
+    About us
+  </Link>
+  <Link
+    href="#contact"
+    className={`${isScrolled ? 'text-gray-700' : 'text-white'} hover:text-rose-600 transition`}
+  >
+    Contact
+  </Link>
+</nav>
 
           {/* Login / Sign Up Button */}
           <button
