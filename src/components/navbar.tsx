@@ -20,19 +20,23 @@ export default function Navbar() {
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold z-50">
-            <span className={isScrolled ? 'text-gray-800' : 'text-white'}>RentHub</span>
+            <span className={isScrolled ? 'text-rose-600' : 'text-white'}>RentHub</span>
           </Link>
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6 z-50">
-            <Link href="/tenant" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
-              For Tenants
-            </Link>
-            <Link href="/landlord" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
-              For Landlords
-            </Link>
-            <Link href="/about" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
+            
+            <Link href="#about" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
               About Us
+            </Link>
+            <Link href="#properties" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
+              Contact Us
+            </Link>
+            <Link href="#services" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
+              Contact Us
+            </Link>
+            <Link href="#contact" className={`${isScrolled ? 'text-gray-600' : 'text-white'} hover:text-indigo-600 transition`}>
+              Contact Us
             </Link>
           </nav>
 
