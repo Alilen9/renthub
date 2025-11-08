@@ -27,7 +27,7 @@ export default function PropertiesPage() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">🏠 My Properties</h1>
+        <h1 className="text-2xl font-bold text-gray-800"> My Properties</h1>
         <p className="text-sm text-gray-500">
           {listings.length} {listings.length === 1 ? "Listing" : "Listings"}
         </p>
