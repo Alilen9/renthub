@@ -4,8 +4,10 @@
 import React from "react";
 import Link from "next/link";
 import { Home, PlusCircle, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
+  const router = useRouter();
   const sidebarNavItems = [
     { href: "/landlord/dashboard", label: "Dashboard" },
     
@@ -14,6 +16,11 @@ export default function Sidebar() {
     { href: "/landlord/payment", label: "Payments" },
     { href: "/landlord/settings", label: "Settings" },
   ];
+
+  const SignOut = () => {
+    // Add sign-out logic here
+    router.push("/");
+  };
 
   return (
     <aside className="col-span-3 bg-white h-screen shadow-md p-6 flex flex-col justify-between">
@@ -32,7 +39,8 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <button className="flex items-center gap-2 text-gray-600 hover:text-red-600">
+      <button className="flex items-center gap-2 text-gray-600 hover:text-red-600"
+      onClick={SignOut}>
         <LogOut size={18} /> Logout
       </button>
     </aside>
