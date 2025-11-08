@@ -20,7 +20,7 @@ export default function DashboardMain({ listings, setListings }: DashboardMainPr
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Landlord Dashboard Overview</h2>
+        <h2 className="text-2xl font-semibold text-black">Landlord Dashboard Overview</h2>
         <button
           onClick={() => router.push("/landlord/add-listing")}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg"
