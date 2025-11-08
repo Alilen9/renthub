@@ -64,11 +64,12 @@ export default function PropertyAccess({ listings, views = {} }: Props) {
         </div>
       ) : (
         <p className="text-gray-500">
-          No properties yet.{" "}
-          <Link href="/landlord/properties/create" className="text-blue-600 underline">
-            Add one now
-          </Link>
-        </p>
+  No properties yet.{" "}
+  <Link href="/landlord/add-listing" className="text-blue-600 underline">
+    Add one now
+  </Link>
+</p>
+
       )}
     </div>
   );
