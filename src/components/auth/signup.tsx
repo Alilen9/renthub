@@ -37,14 +37,8 @@ export default function SignupForm({
     e.preventDefault();
     setIsLoading(true);
 
-    if (role === "landlord") {
-      // For landlords, we first gather info, then proceed to KYC
-      setKycStep(1); // Start KYC flow
-      setIsLoading(false);
-    } else {
-      // For tenants, we register them directly
-      try {
-        await registerUser({ ...formData, username: formData.email }, 'tenant');
+    try {
+        await registerUser({ ...formData, username: formData.email }, role);
         toast.success("Account created! Please log in.");
         onSuccess(); // Show success message and switch to login view
       } catch (err: any) {
@@ -52,7 +46,7 @@ export default function SignupForm({
       } finally {
         setIsLoading(false);
       }
-    }
+
   };
 
 
@@ -298,7 +292,7 @@ export default function SignupForm({
         disabled={isLoading}
         className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-indigo-400"
       >
-        {isLoading ? 'Creating...' : (role === 'tenant' ? 'Create Account' : 'Continue to Verification')}
+        {isLoading ? 'Creating...' : ('Create Account')}
       </button>
 
       <p className="text-sm text-center text-black">
