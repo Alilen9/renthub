@@ -3,12 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { 
-  Home, PlusCircle, LogOut, Building, CreditCard, Settings, Users, Wrench 
-} from "lucide-react";
-import { useRouter } from "next/navigation";   // ✅ FIXED
+  Home, PlusCircle, LogOut, Building, CreditCard, Settings, Users, Wrench, Bell 
+} from "lucide-react"; // added Bell icon for Notices
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
-  const router = useRouter();                 // Works now
+  const router = useRouter();
 
   const sidebarNavItems = [
     { href: "/landlord/dashboard", label: "Dashboard", icon: <Home size={18} /> },
@@ -16,11 +16,12 @@ export default function Sidebar() {
     { href: "/landlord/tenants", label: "Tenants", icon: <Users size={18} /> },
     { href: "/landlord/payment", label: "Payments", icon: <CreditCard size={18} /> },
     { href: "/landlord/maintenance", label: "Maintenance", icon: <Wrench size={18} /> },
+    { href: "/landlord/notices", label: "Notices", icon: <Bell size={18} /> }, // ✅ new button
     { href: "/landlord/settings", label: "Settings", icon: <Settings size={18} /> },
   ];
 
   const SignOut = () => {
-    router.push("/"); // Works now
+    router.push("/");
   };
 
   return (

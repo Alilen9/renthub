@@ -1,19 +1,35 @@
-// src/app/tenant/TenantDashboard.tsx
+// src/app/tenant/dashboard/page.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { listings } from "@/lib/mockData";
-import ListingCard from "@/components/landlord/ListingCard";
+
 import SearchFilters, { Filters } from "@/components/tenants/SearchFilters";
 import PropertyMap from "@/components/tenants/PropertyMap";
 import TenantSidebar from "@/components/tenants/TenantSidebar";
+import ListingCard from "@/components/tenants/ListingCard";
+
+type NoticeFile = {
+  name: string;
+  type: string;
+  size: number;
+  dataUrl?: string;
+};
+
+type Notice = {
+  id: string;
+  title: string;
+  message: string;
+  category: string;
+  priority: string;
+  assignedStaff: string[];
+  files?: NoticeFile[];
+  createdAt: string;
+  readBy: string[]; // tenant IDs who read this notice
+};
 
 export default function TenantDashboard() {
   const [activeMenu, setActiveMenu] = useState("Dashboard");
-  const [selectedListing, setSelectedListing] = useState<any>(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [filters, setFilters] = useState<Filters>({
@@ -23,7 +39,31 @@ export default function TenantDashboard() {
     verifiedOnly: false,
   });
 
-  const router = useRouter();
+  // --- Notices ---
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const tenantId = "tenant_1"; // could be dynamic from auth/session
+
+  useEffect(() => {
+    const stored: Notice[] = JSON.parse(localStorage.getItem("notices") || "[]");
+    setNotices(stored.reverse());
+  }, []);
+
+  const unreadNotices = notices.filter(n => !n.readBy.includes(tenantId));
+
+  const toggleReadNotice = (id: string) => {
+    const updated = notices.map((n) => {
+      if (n.id === id) {
+        const isRead = n.readBy.includes(tenantId);
+        const updatedReadBy = isRead
+          ? n.readBy.filter(tid => tid !== tenantId)
+          : [...n.readBy, tenantId];
+        return { ...n, readBy: updatedReadBy };
+      }
+      return n;
+    });
+    setNotices(updated);
+    localStorage.setItem("notices", JSON.stringify(updated.reverse()));
+  };
 
   const filteredListings = listings.filter((listing) => {
     if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
@@ -89,8 +129,33 @@ export default function TenantDashboard() {
 
         {/* Dashboard Content */}
         <main className="p-6 flex-1 overflow-y-auto">
+          {/* --- Notification Banner --- */}
+          {unreadNotices.length > 0 && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6 rounded shadow flex justify-between items-center">
+              <p className="text-yellow-800 font-medium">
+                You have {unreadNotices.length} unread notice
+                {unreadNotices.length > 1 ? "s" : ""}!
+              </p>
+              <div className="flex gap-2">
+                <a
+                  href="/tenant/notices"
+                  className="underline text-yellow-900 hover:text-yellow-700"
+                >
+                  View Notices
+                </a>
+                <button
+                  onClick={() => unreadNotices.forEach(n => toggleReadNotice(n.id))}
+                  className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                >
+                  Mark all read
+                </button>
+              </div>
+            </div>
+          )}
+
           {activeMenu === "Dashboard" && (
             <>
+              {/* Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-lg shadow">
                   <h3 className="text-gray-500">Saved Properties</h3>
@@ -106,28 +171,18 @@ export default function TenantDashboard() {
                 </div>
               </div>
 
+              {/* Map View */}
               {showMap && (
                 <div className="mt-6 mb-8">
                   <PropertyMap listings={filteredListings} />
                 </div>
               )}
 
+              {/* Listings */}
               <h3 className="text-lg font-semibold mt-6 mb-4">Available Properties</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredListings.map((listing) => (
-                  <ListingCard
-                    key={listing.id}
-                    listing={listing}
-                    onView={() => {
-                      setSelectedListing(listing);
-                      setShowViewModal(true);
-                    }}
-                    onAnalytics={() => {
-                      setSelectedListing(listing);
-                      setShowAnalyticsModal(true);
-                    }}
-                    onDelete={() => alert("Delete disabled for tenants")}
-                  />
+                  <ListingCard key={listing.id} listing={listing} />
                 ))}
                 {filteredListings.length === 0 && (
                   <p className="text-gray-600">No listings match your filters.</p>
@@ -143,54 +198,6 @@ export default function TenantDashboard() {
           )}
         </main>
       </div>
-
-      {/* View Modal */}
-      {showViewModal && selectedListing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <h2 className="text-xl font-bold mb-4">{selectedListing.title}</h2>
-            <img
-              src={selectedListing.images[0]}
-              alt={selectedListing.title}
-              className="w-full h-48 object-cover rounded mb-4"
-            />
-            <p className="text-gray-600">{selectedListing.description}</p>
-            <p className="mt-2 text-red-700 font-semibold">
-              Ksh {selectedListing.price.toLocaleString()}
-            </p>
-            <button
-              onClick={() => router.push(`/tenant/listing/${selectedListing.id}`)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Explore
-            </button>
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-700"
-              onClick={() => setShowViewModal(false)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Analytics Modal */}
-      {showAnalyticsModal && selectedListing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <h2 className="text-xl font-bold mb-4">Analytics: {selectedListing.title}</h2>
-            <p className="text-gray-600">📊 Views: 120</p>
-            <p className="text-gray-600">⭐ Interested: 45</p>
-            <p className="text-gray-600">✅ Applications: 10</p>
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-700"
-              onClick={() => setShowAnalyticsModal(false)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
