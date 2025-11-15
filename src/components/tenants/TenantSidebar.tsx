@@ -10,6 +10,7 @@ import {
   FiLogOut,
   FiKey,
   FiCalendar,
+  FiAlertCircle, // New icon for Report Fault
 } from "react-icons/fi";
 
 // 🎨 RentHub Brand Colors
@@ -53,6 +54,12 @@ function TenantSidebar({ activeMenu, setActiveMenu }: SidebarProps) {
     router.push("/tenant/settings");
   };
 
+  const handleReportFaultClick = () => {
+    setActiveMenu("Report Fault");
+    // Path to your maintenance page
+    router.push("/tenant/maintainance");
+  };
+
   return (
     <aside
       className="w-64 min-h-screen flex flex-col shadow-lg"
@@ -93,6 +100,18 @@ function TenantSidebar({ activeMenu, setActiveMenu }: SidebarProps) {
           <FiCalendar /> <span>Book a Viewing</span>
         </button>
 
+        {/* New Report Fault Button */}
+        <button
+          onClick={handleReportFaultClick}
+          className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition ${
+            activeMenu === "Report Fault"
+              ? "bg-[#C81E1E] text-white shadow-md"
+              : "text-gray-200 hover:bg-[#C81E1E]/80"
+          }`}
+        >
+          <FiAlertCircle /> <span>Report Fault</span>
+        </button>
+
         <button
           onClick={handleMessagesClick}
           className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition ${
@@ -104,7 +123,6 @@ function TenantSidebar({ activeMenu, setActiveMenu }: SidebarProps) {
           <FiMessageSquare /> <span>Messages</span>
         </button>
 
-        {/* ✅ Settings Button */}
         <button
           onClick={handleSettingsClick}
           className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition ${
