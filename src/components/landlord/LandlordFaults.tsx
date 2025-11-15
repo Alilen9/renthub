@@ -141,7 +141,7 @@ export default function LandlordFaults() {
     setFaults(updated);
     setMessageInputs(prev => ({ ...prev, [id]: "" }));
 
-    // Auto-reply from tenant after 1.5s
+    // Auto reply
     setTimeout(() => {
       setFaults(prev => prev.map(f =>
         f.id === id
@@ -239,16 +239,12 @@ export default function LandlordFaults() {
                 {f.priority || "Low"} Priority
               </span>
             </div>
+
             <div className="mb-2">{f.description}</div>
             <div className="text-sm mb-1">
               <span className="font-medium">Tenant:</span> {f.tenantName} | <span className="font-medium">Unit:</span> {f.unitNumber} | <span className="font-medium">Property:</span> {f.propertyType} - {f.propertyArea}
             </div>
-            <div className="text-sm mb-2">
-              <span className="font-medium">Email:</span> {f.tenantEmail} | <span className="font-medium">Phone:</span> {f.tenantPhone}
-            </div>
-            {f.serviceProvider && <div className="font-medium mb-2 text-maroon">Service Provider: {f.serviceProvider}</div>}
 
-            {/* Media */}
             {f.mediaUrl && (
               <img
                 src={f.mediaUrl}
@@ -258,35 +254,13 @@ export default function LandlordFaults() {
               />
             )}
 
-            {/* Progress */}
-            {f.status === "Assigned" && f.serviceProvider && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Progress Status:</label>
-                <select
-                  value={f.serviceProviderProgress}
-                  onChange={e => updateProgress(f.id, Number(e.target.value))}
-                  className="w-full border rounded-lg p-2 mb-2 focus:ring-maroon"
-                >
-                  <option value={0}>Assigned</option>
-                  <option value={25}>In Progress</option>
-                  <option value={50}>Halfway</option>
-                  <option value={75}>Almost Done</option>
-                  <option value={100}>Resolved</option>
-                </select>
-                <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-1">
-                  <div className={`h-3 ${progressColor(f.serviceProviderProgress ?? 0)} rounded-full`} style={{ width: `${f.serviceProviderProgress ?? 0}%` }} />
-                </div>
-                <div className="text-xs">{progressLabel(f.serviceProviderProgress ?? 0)} | Expected: {new Date(f.expectedCompletion ?? Date.now()).toLocaleDateString()}</div>
-              </div>
-            )}
-
-            {/* Chat */}
+            {/* Chat Box */}
             <div className="flex flex-col bg-gray-50 border rounded-lg p-3 max-h-48 overflow-y-auto gap-2 mb-4">
               {(f.messages || []).map((m, idx) => (
                 <div
                   key={idx}
                   className={`p-2 rounded-xl max-w-[85%] self-${m.sender === "Landlord" ? "end" : "start"} shadow-sm ${
-                    m.sender === "Landlord" ? "bg-yellow-100 text-black" : "bg-gray-200 text-black"
+                    m.sender === "Landlord" ? "bg-yellow-100" : "bg-gray-200"
                   }`}
                 >
                   <div className="text-xs font-medium mb-1">{m.sender}</div>
@@ -296,46 +270,26 @@ export default function LandlordFaults() {
               ))}
             </div>
 
-            {/* Actions + Chat Input */}
-            <div className="flex flex-col gap-3">
-              {f.status === "Pending" && (
-                <button
-                  onClick={() => assignServiceProvider(f.id)}
-                  className="px-5 py-2 rounded-lg shadow-md flex items-center justify-center gap-2 text-white bg-gradient-to-r from-[#C81E1E] to-[#58181C] hover:scale-105 transition-transform"
-                >
-                  <Wrench size={16} /> Assign Provider
-                </button>
-              )}
-
-              {f.status === "Assigned" && f.serviceProviderProgress === 100 && (
-                <button
-                  onClick={() => resolveFault(f.id)}
-                  className="px-5 py-2 rounded-lg shadow-md flex items-center justify-center gap-2 text-white bg-gradient-to-r from-[#C81E1E] to-[#58181C] hover:scale-105 transition-transform"
-                >
-                  <CheckCircle size={16} /> Mark Resolved
-                </button>
-              )}
-
-              <div className="flex gap-2 mt-2">
-                <input
-                  type="text"
-                  value={messageInputs[f.id] || ""}
-                  onChange={e => setMessageInputs(prev => ({ ...prev, [f.id]: e.target.value }))}
-                  placeholder="Type message..."
-                  className="flex-1 px-4 py-2 border rounded-l-lg focus:ring-maroon focus:border-maroon"
-                />
-                <button
-                  onClick={() => sendMessage(f.id)}
-                  className="px-4 py-2 rounded-r-lg bg-gradient-to-r from-[#C81E1E] to-[#58181C] text-white flex items-center justify-center hover:opacity-90 transition"
-                >
-                  <Send size={16} />
-                </button>
-              </div>
-
-              <span className={`mt-2 inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColor(f.status)}`}>
-                {f.status}
-              </span>
+            {/* Chat Input FIXED */}
+            <div className="flex items-center gap-0 mt-2 w-full">
+              <input
+                type="text"
+                value={messageInputs[f.id] || ""}
+                onChange={e => setMessageInputs(prev => ({ ...prev, [f.id]: e.target.value }))}
+                placeholder="Type message..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-l-xl focus:ring-maroon focus:border-maroon text-black bg-white"
+              />
+              <button
+                onClick={() => sendMessage(f.id)}
+                className="px-4 py-2 rounded-r-xl bg-gradient-to-r from-[#C81E1E] to-[#58181C] text-white flex items-center justify-center hover:opacity-90 transition h-full"
+              >
+                <Send size={16} />
+              </button>
             </div>
+
+            <span className={`mt-2 inline-block px-3 py-1 rounded-full text-sm font-medium ${statusColor(f.status)}`}>
+              {f.status}
+            </span>
           </div>
         ))}
       </div>
@@ -347,6 +301,7 @@ export default function LandlordFaults() {
             <button onClick={() => setModalMedia(null)} className="absolute top-2 right-2 text-white bg-gray-800 rounded-full p-1 hover:bg-gray-700">
               <X size={20} />
             </button>
+
             {modalMedia.endsWith(".mp4") ? (
               <video controls className="max-h-[80vh] max-w-[80vw] rounded-lg">
                 <source src={modalMedia} type="video/mp4" />
