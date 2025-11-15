@@ -8,6 +8,7 @@ export default function TenantDashboardPage() {
   const [activeMenu, setActiveMenu] = useState("Dashboard"); // track active menu
 
   const tenant = {
+    id: "1",
     name: "Alice Mkangoma",
     email: "mkangomaalice@gmail.com",
     phone: "0113336555",
