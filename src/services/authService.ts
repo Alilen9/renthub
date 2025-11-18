@@ -5,11 +5,14 @@ interface LoginCredentials {
   password: string;
 }
 
+// ✅ Add serviceProvider to allowed roles
+type Role = "tenant" | "landlord" | "serviceProvider";
+
 interface LoginSuccessResponse {
   token: string;
   user: {
     email: string;
-    role: "tenant" | "landlord";
+    role: Role;
   };
 }
 
@@ -23,7 +26,7 @@ interface ResetPasswordResponse {
 
 export const loginUser = async (
   credentials: LoginCredentials,
-  role: "tenant" | "landlord"
+  role: Role
 ): Promise<LoginSuccessResponse> => {
   await new Promise((resolve) => setTimeout(resolve, 800));
 
@@ -34,14 +37,25 @@ export const loginUser = async (
   };
 };
 
-export const registerUser = async (): Promise<RegisterSuccessResponse> => {
+export const registerUser = async (
+  p0: {
+    username: string;
+    full_name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    address?: string;
+    company_name?: string;
+  },
+  p1: Role
+): Promise<RegisterSuccessResponse> => {
   await new Promise((resolve) => setTimeout(resolve, 800));
   return { message: "Registered successfully (mock)" };
 };
 
 export const requestPasswordReset = async (
   email: string,
-  role: "tenant" | "landlord"
+  role: Role
 ): Promise<ResetPasswordResponse> => {
   await new Promise((resolve) => setTimeout(resolve, 800));
   return { message: `Password reset email sent to ${email} (${role})` };

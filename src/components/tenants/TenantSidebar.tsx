@@ -10,6 +10,9 @@ import {
   FiCalendar,
   FiAlertCircle,
   FiFile,
+  FiAlertTriangle,
+  FiBarChart2,
+  FiBell,
 } from "react-icons/fi";
 
 type SidebarProps = {
@@ -26,8 +29,16 @@ function TenantSidebar({ activeMenu, setActiveMenu }: SidebarProps) {
     { name: "Book a Viewing", icon: <FiCalendar />, path: "/tenant/booking-system" },
     { name: "Report Fault", icon: <FiAlertCircle />, path: "/tenant/maintainance" },
     { name: "Messages", icon: <FiMessageSquare />, path: "/tenant/chat" },
-    { name: "Notices", icon: <FiFile />, path: "/tenant/notices" },
-    { name: "Settings", icon: <FiSettings />, path: "/tenant/settings" },
+    { name: "Notices", icon: <FiBell />, path: "/tenant/notices" },
+    { name: "Complain", icon: <FiAlertTriangle />, path: "/tenant/complain" },
+    { name: "TenantAnalytics", icon: <FiBarChart2 />, path: "/tenant/TenantAnalytics" },
+    { name: "Fairnesspolicy", icon: <FiFile />, path: "/tenant/fairness" },
+
+
+ { name: "Settings", icon: <FiSettings />, path: "/tenant/settings" },
+    
+
+   
   ];
 
   const handleClick = (item: typeof menuItems[0]) => {

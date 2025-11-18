@@ -3,7 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { 
-  Home, PlusCircle, LogOut, Building, CreditCard, Settings, Users, Wrench, Bell 
+  Home, PlusCircle, LogOut, Building, CreditCard, Settings, Users, Wrench, Bell, 
+  FileText, Briefcase
 } from "lucide-react"; // added Bell icon for Notices
 import { useRouter } from "next/navigation";
 
@@ -17,6 +18,8 @@ export default function Sidebar() {
     { href: "/landlord/payment", label: "Payments", icon: <CreditCard size={18} /> },
     { href: "/landlord/maintenance", label: "Maintenance", icon: <Wrench size={18} /> },
     { href: "/landlord/notices", label: "Notices", icon: <Bell size={18} /> }, // ✅ new button
+   { href: "/landlord/fairness", label: "Fairness & Transparency", icon: <FileText size={18} /> },
+   { href: "/landlord/Service_providers", label: "Service Providers", icon: <Briefcase size={18} /> }, // ✅ new button
     { href: "/landlord/settings", label: "Settings", icon: <Settings size={18} /> },
   ];
 
