@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Wrench, Settings, LogOut, FileText } from "lucide-react";
+import { Home, Wrench, Settings, LogOut, FileText, MessageSquare, Wallet, HelpCircle, FileCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation"; // to detect active route
@@ -13,7 +13,13 @@ export default function SPNSidebar() {
     { href: "/spn/dashboard", label: "Dashboard", icon: <Home size={18} /> },
     { href: "/spn/tasks", label: "Tasks", icon: <Wrench size={18} /> },
     { href: "/spn/profile", label: "Profile", icon: <FileText size={18} /> },
+     { href: "/spn/messages", label: "Messages", icon: <MessageSquare size={18} /> },
+    { href: "/spn/wallet", label: "Wallet", icon: <Wallet size={18} /> },
+  {href: "/spn/verification", label: "Verification", icon: <FileCheck size={18} /> },
+  {href: "/spn/help", label: "Help Center", icon: <HelpCircle size={18} /> },
+
     { href: "/spn/settings", label: "Settings", icon: <Settings size={18} /> },
+
   ];
 
   const handleSignOut = () => {
