@@ -1,5 +1,6 @@
 // src/app/reserve/[id]/page.tsx
-import PaymentOptions from "@/components/tenants/";
+import PaymentOptions from "@/components/tenants/PaymentOptions";
+
 import { listings } from "@/lib/mockData";
 
 
