@@ -233,15 +233,10 @@ export default function TenantChatPage() {
       try {
         setLoadingChats(true);
         const rawChatList = await fetchTenantChats();
-        const chatList: ChatListItemType[] = rawChatList.map((ticket: any) => ({
-          id: ticket.id,
-          landlord_name: ticket.subject, // Mapping from API response
-          last_message: ticket.latest_message || "No messages yet.", // Mapping from API response
-          unread_count: ticket.unread_count || 0, // Assuming this property exists or defaulting
-        }));
-        setChats(chatList); 
-        if (chatList.length > 0) {
-          setActiveChatId(chatList[0].id);
+        console.log("chats", chats);
+        setChats(chats); 
+        if (chats.length > 0) {
+          setActiveChatId(chats[0].id);
         }
       } catch (err: unknown) {
         setError("Failed to load chats. Please refresh the page.");

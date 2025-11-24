@@ -12,9 +12,10 @@ export type ListingDraft = {
   county: string | number | readonly string[] | undefined;
   type: string | number | readonly string[] | undefined;
   files: (File | ListingFile)[];  // ✅ unified here
-  title: string;
-  price: number | "";
+  name: string;
+  price: number | 0;
   location: { lat: number | null; lng: number | null; address?: string; county?: string };
+  description: string;
   houseType: string;
   amenities: string[];
   media: Array<{ url?: string; name?: string; type: "image" | "video" | "360"; size?: number }>;

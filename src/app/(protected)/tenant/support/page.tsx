@@ -31,6 +31,7 @@ export default function SupportPage() {
             try {
                 setIsLoading(true);
                 const data = await fetchTenantTickets();
+                console.log("data of tickets:", data);
                 setTickets(data);
             } catch (err: any) {
                 setError('Failed to load support tickets. Please try again later.');

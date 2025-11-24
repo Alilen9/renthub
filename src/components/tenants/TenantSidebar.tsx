@@ -31,6 +31,7 @@ function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
       { name: 'Fianlize-MoveIn', href: '/tenant/booking-system', icon: FiKey },
       { name: 'Booking', href: `/tenant/booking-system?listing=${encodedListing}`, icon: FiCalendar },
       { name: 'Messages', href: '/tenant/chat', icon: FiMessageSquare },
+      { name: 'Support', href: '/tenant/support', icon: FiMessageSquare },
       { name: 'Settings', href: '/tenant/settings', icon: Settings },
   ];
   const [activeMenu, setActiveMenu] = useState("Dashboard");

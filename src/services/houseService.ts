@@ -1,4 +1,6 @@
+
 import { Apartment } from "@/utils";
+import { apiFetch } from "./api";
 
 /**
  * Fetches a list of apartments from the API.
@@ -49,3 +51,36 @@ export async function fetchListings(limit?: number): Promise<Apartment[]> {
         return []; // Return an empty array on error
     }
 }
+
+export const createListing = async (formData: FormData): Promise<Apartment> => {
+  const data = await apiFetch<{ apartment: Apartment }>(
+    '/api/houses',
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
+  return data.apartment;
+};
+
+export const updateProduct = async (id: string, formData: FormData): Promise<Apartment> => {
+    const data = await apiFetch<{ apartment: Apartment }>(
+        `/api/products/${id}`,
+        {
+            method: 'PUT',
+            body: formData,
+        }
+    );
+    return data.apartment;
+};
+
+export const deleteHouse = async (id: string, formData: FormData): Promise<Apartment> => {
+    const data = await apiFetch<{ apartment: Apartment }>(
+        `/api/products/${id}`,
+        {
+            method: 'PUT',
+            body: formData,
+        }
+    );
+    return data.apartment;
+};
