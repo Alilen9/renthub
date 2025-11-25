@@ -11,7 +11,7 @@ export default function ListingMediaSection({
   setForm,
   onSubmit,
 }: {
-  form: ListingDraft;
+  form: ListingDraft & { isSubmitting?: boolean }; // Allow passing isSubmitting state
   setForm: React.Dispatch<React.SetStateAction<ListingDraft>>;
   onSubmit: () => void;
 }) {
@@ -22,8 +22,8 @@ const selectedPackage = (form.package as "free" | "standard" | "premium") || "fr
   return (
     <div className="flex-1 space-y-4">
       <FileUploader
-        onFilesSelected={(files) => setForm((prev) => ({ ...prev, files }))}
-        selectedFiles={form.files}
+        onFilesSelected={(files) => setForm((prev) => ({ ...prev, new_files: files }))}
+        selectedFiles={form.new_files || []}
       />
 
       <PackageSelector

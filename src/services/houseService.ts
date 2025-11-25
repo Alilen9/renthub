@@ -63,24 +63,24 @@ export const createListing = async (formData: FormData): Promise<Apartment> => {
   return data.apartment;
 };
 
-export const updateProduct = async (id: string, formData: FormData): Promise<Apartment> => {
-    const data = await apiFetch<{ apartment: Apartment }>(
-        `/api/products/${id}`,
+export const updateListing = async (id: string, formData: FormData): Promise<Apartment> => {
+    const response = await apiFetch<{ data: Apartment }>(
+        `/api/houses/${id}`, // Correct endpoint for updating houses
         {
             method: 'PUT',
             body: formData,
         }
     );
-    return data.apartment;
+    return response.data;
 };
 
-export const deleteHouse = async (id: string, formData: FormData): Promise<Apartment> => {
-    const data = await apiFetch<{ apartment: Apartment }>(
-        `/api/products/${id}`,
+export const deleteHouse = async (id: string): Promise<{ success: boolean; message: string }> => {
+    const data = await apiFetch<{ success: boolean; message:string }>(
+        `/api/houses/${id}`, // Correct endpoint for deleting houses
         {
-            method: 'PUT',
-            body: formData,
+            method: 'DELETE',
+            // No body is needed for the delete operation as per the backend route
         }
     );
-    return data.apartment;
+    return data;
 };

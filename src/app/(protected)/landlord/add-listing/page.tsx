@@ -15,20 +15,18 @@ export default function AddListingPage() {
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Apartment | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+ 
   const [form, setForm] = useState<ListingDraft>({
     name: "",
     price: 0,
     description: "",
-    county: "",
-    type: "",
     amenities: [],
-    files: [],
+    new_files: [],
     location: { lat: null, lng: null, address: "", county: "" },
     houseType: "",
-    media: [],
+    video_url: "", // Added for video URL
+    is_active: true, // Default to active
   });
-
   const handleNext = () => {
 
     
@@ -36,15 +34,23 @@ export default function AddListingPage() {
     router.push("/landlord/dashboard/payment");
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
 
   //   const { name, description, price, location, category, video_url } = req.body;
   // const landlord_id = req.user.id;
   // const image_urls = [];
-    e.preventDefault();
+    e?.preventDefault();
     // Validate form
-    if (!form.name.trim() || !form.price || form.price <= 0 || form.location) {
-      toast.error("Product name and valid price are required.");
+    if (!form.name.trim()) {
+      toast.error("Listing name is required.");
+      return;
+    }
+    if (!form.price || form.price <= 0) {
+      toast.error("A valid price is required.");
+      return;
+    }
+    if (!form.location.address) {
+      toast.error("A location address is required.");
       return;
     }
     
@@ -52,14 +58,18 @@ export default function AddListingPage() {
     setIsSubmitting(true);
     const formData = new FormData();
     formData.append("name", form.name.trim());
+    formData.append("category", form.houseType);
     formData.append("description", form.description);
-    formData.append("location", form.location);
-    formData.append("price", form.price);
+    formData.append("location", form.location.address);
+    formData.append("price", form.price.toString());
+    formData.append("amenities", JSON.stringify(form.amenities));
     
-    formData.append("video_url", form.media);
-    formData.append("image_url", form.media)
-    formData.append("is_active", form.is_active.toString());
+    formData.append("video_url", form.video_url || '');
+    formData.append("is_active", form.is_active?.toString() || 'true');
 
+    form.new_files?.forEach(file => {
+      formData.append('images', file);
+    });
     
     try {
       const newProduct = await createListing(formData);
