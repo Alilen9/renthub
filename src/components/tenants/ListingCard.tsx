@@ -48,7 +48,7 @@ export default function ListingCard({ listing }: { listing: Listing }) {
 
         {/* Price */}
         <p className="mt-2 text-red-600 font-bold">
-          KES {listing.price.toLocaleString()}
+          KES {listing.price?.toLocaleString()}
         </p>
 
         {/* Details */}

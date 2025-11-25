@@ -4,7 +4,6 @@ import { ListingDraft } from "./types";
 import LocationPicker from "../map/LocationPicker";
 import Input from "../ui/Input";
 
-
 export default function ListingDetailsForm({
   form,
   setForm,
@@ -43,7 +42,9 @@ export default function ListingDetailsForm({
         label="Amenities (comma separated)"
         name="amenities"
         value={form.amenities.join(", ")}
-        onChange={(e) => setForm({ ...form, amenities: e.target.value.split(",").map(a => a.trim()) })}
+        onChange={(e) =>
+          setForm({ ...form, amenities: e.target.value.split(",").map((a) => a.trim()) })
+        }
       />
 
       <LocationPicker onSelect={(loc) => setForm({ ...form, location: loc })} />

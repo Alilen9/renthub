@@ -1,9 +1,9 @@
 "use client";
-import React from "react";
 
+import React from "react";
 import Button from "../ui/Button";
 import FileUploader from "../upload/FileUploader";
-import { ListingDraft } from "./types";
+import { ListingDraft, ListingFile } from "./types";
 import PackageSelector from "../package/PackageSelector";
 
 export default function ListingMediaSection({
@@ -15,9 +15,39 @@ export default function ListingMediaSection({
   setForm: React.Dispatch<React.SetStateAction<ListingDraft>>;
   onSubmit: () => void;
 }) {
-  // fallback to "free" if undefined
-const selectedPackage = (form.package as "free" | "standard" | "premium") || "free";
+  const selectedPackage =
+    (form.package as "free" | "standard" | "premium") || "free";
 
+  // ✅ Corrected file type handling with strict typing
+  const handleFilesSelected = (files: (File | ListingFile)[]) => {
+    const media: ListingFile[] = files.map((file) => {
+      if (file instanceof File) {
+        // Determine valid file type
+        let fileType: "video" | "image" | "360" = "image";
+        if (file.type.startsWith("video")) fileType = "video";
+        // You can optionally detect "360" by filename if needed
+
+        return {
+          url: URL.createObjectURL(file),
+          name: file.name,
+          type: fileType,
+          size: file.size,
+        };
+      } else {
+        // Ensure already structured ListingFile matches correct type
+        const validType: "video" | "image" | "360" =
+          file.type === "video" || file.type === "360" ? file.type : "image";
+        return { ...file, type: validType };
+      }
+    });
+
+    // ✅ Update form state safely
+    setForm((prev: ListingDraft): ListingDraft => ({
+      ...prev,
+      files: files.filter((f): f is File => f instanceof File),
+      media: media,
+    }));
+  };
 
   return (
     <div className="flex-1 space-y-4">
@@ -28,7 +58,12 @@ const selectedPackage = (form.package as "free" | "standard" | "premium") || "fr
 
       <PackageSelector
         selected={selectedPackage}
-        onChange={(pkg: any) => setForm((prev) => ({ ...prev, package: pkg }))}
+        onChange={(pkg: any) =>
+          setForm((prev) => ({
+            ...prev,
+            package: pkg,
+          }))
+        }
       />
 
       <Button

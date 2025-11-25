@@ -1,56 +1,46 @@
-// src/components/landlord/DashboardMain.tsx
 "use client";
 
-import React from "react";
-import ListingCard from "./ListingCard";
-import { ListingDraft, ListingFile } from "./types";
+import { useRouter } from "next/navigation";
+import WalletSummary from "./overview/WalletSummary";
+import PaymentsOverview from "./overview/PaymentsOverview";
+import PropertyAnalytics from "./overview/PropertyAnalytics";
+import PropertyAccess from "./overview/PropertyAccess";
+import { ListingDraft } from "./types";
+import TenantInquiries from "./overview/TenantInquiries";
 
 interface DashboardMainProps {
-  setCreateOpen: (v: boolean) => void;
   listings: ListingDraft[];
-  setListings: React.Dispatch<React.SetStateAction<ListingDraft[]>>; // ✅ new prop to update listings
+  setListings: React.Dispatch<React.SetStateAction<ListingDraft[]>>;
 }
 
-export default function DashboardMain({
-  setCreateOpen,
-  listings,
-  setListings,
-}: DashboardMainProps) {
-  const handleDelete = (idx: number) => {
-    const updated = listings.filter((_, i) => i !== idx);
-    setListings(updated);
-    localStorage.setItem("listings", JSON.stringify(updated)); // ✅ persist change
-  };
+export default function DashboardMain({ listings, setListings }: DashboardMainProps) {
+  const router = useRouter();
 
   return (
-    <main className="col-span-9">
-      <section className="bg-white p-6 rounded-2xl shadow-sm">
-        <header className="flex items-center justify-between">
-          <h1 className="text-black font-semibold">My Listings</h1>
-         
-        </header>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Landlord Dashboard Overview</h2>
+        <button
+          onClick={() => router.push("/landlord/add-listing")}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+        >
+          + Add Property
+        </button>
+      </div>
 
-        {/* Listings Grid */}
-        <div className="mt-6 grid grid-cols-3 gap-4 text-black">
-          {listings.length > 0 ? (
-            listings.map((listing, idx) => (
-              <ListingCard
-                key={idx}
-                title={listing.title}
-                price={Number(listing.price)}
-                location={listing.county as string}
-                files={listing.files as ListingFile[]}
-                onDelete={() => handleDelete(idx)} // ✅ pass delete handler
-                description={""}              />
-            ))
-          ) : (
-            <div className="col-span-3 border rounded p-6 text-center text-gray-500">
-              No listings yet. Click{" "}
-              <span className="font-semibold">+ Add Listing</span> to create one.
-            </div>
-          )}
-        </div>
-      </section>
-    </main>
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <WalletSummary />
+        <PaymentsOverview />
+        <TenantInquiries />
+      </div>
+
+      {/* Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PropertyAnalytics listings={listings} views={{}} />
+        <PropertyAccess listings={listings} />
+      </div>
+    </div>
   );
 }

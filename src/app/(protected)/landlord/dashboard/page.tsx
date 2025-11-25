@@ -16,7 +16,8 @@ export default function DashboardPage() {
   return (
     <div className="p-6 w-full">
       <DashboardMain
-        setCreateOpen={setCreateOpen}
+        
+        
         listings={listings}
         setListings={setListings}
       />
