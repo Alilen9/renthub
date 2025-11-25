@@ -22,11 +22,6 @@ export default function ListingCard({
   onDelete,
 }: ListingCardProps) {
   const primaryMedia = media && media.length > 0 ? media[0] : null;
-export default function ListingCard(
-  { apartment }: ListingCardProps) {
-  const previewImage =
-    apartment.image_urls?.[0] || '/placeholder-image.png';
-
 
   return (
     <div className="border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 bg-white">

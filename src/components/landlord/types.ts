@@ -11,7 +11,6 @@ export type ListingFile = {
   size?: number;
 };
 
-
 export type ListingDraft = {
   id?: string; 
   county: string | number | readonly string[] | undefined;
@@ -22,13 +21,11 @@ export type ListingDraft = {
   location: { lat: number | null; lng: number | null; address?: string; county?: string };
   houseType: string;
   amenities: string[];
-  video_url?: string;
-  is_active?: boolean;
-  // Fields for handling images during edit
-  existing_image_urls?: string[]; // URLs of images already on the server
-  new_files?: File[]; // New files selected for upload
+  media: Array<{ url?: string; name?: string; type: "image" | "video" | "360"; size?: number }>;
+  visibility?: "local" | "national" | "international";
   package?: "free" | "standard" | "premium";
 };
+
 
 export type Message = {
   id: string;

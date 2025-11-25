@@ -18,7 +18,7 @@ export default function ListingDetailsForm({
 
   return (
     <div className="flex-1 space-y-4">
-      <Input label="Title" name="name" value={form.name} onChange={handleChange} placeholder="e.g. Spacious 2BR Apartment" />
+      <Input label="Title" name="name" value={form.title} onChange={handleChange} placeholder="e.g. Spacious 2BR Apartment" />
       <Input label="Price (Ksh)" name="price" type="number" value={form.price} onChange={handleChange} placeholder="25000" />
       <Input label="County" name="county" value={form.county} onChange={handleChange} placeholder="Nairobi" />
 

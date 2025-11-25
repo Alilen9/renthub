@@ -16,16 +16,18 @@ export default function AddListingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
  
   const [form, setForm] = useState<ListingDraft>({
-    name: "",
+    title: "",
     price: 0,
-    description: "",
+    county: "",
+    type: "",
     amenities: [],
-    new_files: [],
+    files: [],
     location: { lat: null, lng: null, address: "", county: "" },
     houseType: "",
-    video_url: "", // Added for video URL
+    media: "",
     is_active: true, // Default to active
   });
+  
   const [freeCount, setFreeCount] = useState(0);
 
   useEffect(() => {
@@ -67,8 +69,8 @@ export default function AddListingPage() {
   // const image_urls = [];
     e?.preventDefault();
     // Validate form
-    if (!form.name.trim()) {
-      toast.error("Listing name is required.");
+    if (!form.title.trim()) {
+      toast.error("Listing title is required.");
       return;
     }
     if (!form.price || form.price <= 0) {
@@ -83,14 +85,14 @@ export default function AddListingPage() {
 
     setIsSubmitting(true);
     const formData = new FormData();
-    formData.append("name", form.name.trim());
+    formData.append("name", form.title.trim()); // The backend expects 'name'
     formData.append("category", form.houseType);
-    formData.append("description", form.description);
+    formData.append("description", ""); // Assuming description comes from somewhere else or is optional
     formData.append("location", form.location.address);
     formData.append("price", form.price.toString());
     formData.append("amenities", JSON.stringify(form.amenities));
     
-    formData.append("video_url", form.video_url || '');
+    formData.append("video_url", form.media || '');
     formData.append("is_active", form.is_active?.toString() || 'true');
 
     form.new_files?.forEach(file => {
