@@ -24,7 +24,7 @@ export default function AddListingPage() {
     files: [],
     location: { lat: null, lng: null, address: "", county: "" },
     houseType: "",
-    media: "",
+    media: [],
     is_active: true, // Default to active
   });
   
@@ -63,10 +63,6 @@ export default function AddListingPage() {
   };
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
-
-  //   const { name, description, price, location, category, video_url } = req.body;
-  // const landlord_id = req.user.id;
-  // const image_urls = [];
     e?.preventDefault();
     // Validate form
     if (!form.title.trim()) {
@@ -92,12 +88,10 @@ export default function AddListingPage() {
     formData.append("price", form.price.toString());
     formData.append("amenities", JSON.stringify(form.amenities));
     
-    formData.append("video_url", form.media || '');
-    formData.append("is_active", form.is_active?.toString() || 'true');
+    
+    formData.append("is_active", form.is_active.toString() || 'true');
 
-    form.new_files?.forEach(file => {
-      formData.append('images', file);
-    });
+    
     
     try {
       const newProduct = await createListing(formData);

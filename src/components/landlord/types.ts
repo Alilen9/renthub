@@ -24,6 +24,7 @@ export type ListingDraft = {
   media: Array<{ url?: string; name?: string; type: "image" | "video" | "360"; size?: number }>;
   visibility?: "local" | "national" | "international";
   package?: "free" | "standard" | "premium";
+  is_active: boolean;
 };
 
 
