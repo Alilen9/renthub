@@ -38,31 +38,6 @@ export default function SignupForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-        await registerUser({ ...formData, username: formData.email }, role);
-        toast.success("Account created! Please log in.");
-        onSuccess(); // Show success message and switch to login view
-      } catch (err: any) {
-        toast.error(err.message || "An unexpected error occurred.");
-      } finally {
-        setIsLoading(false);
-      }
-
-  };
-
-
-  // File upload
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
   // Start camera
   const startCamera = async () => {
     try {

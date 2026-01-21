@@ -95,21 +95,26 @@ export default function AddListingPage() {
     
     try {
       const newProduct = await createListing(formData);
-      
-      if (newProduct.id) {
+
+      if (newProduct && newProduct.id) {
         toast.success("Product added successfully!");
         //fetchProducts(); // Refresh the product list
         
         // Reset and close form
-        //setShowForm(false);
-        // setForm({ 
-        //   name: "", 
-        //   price: 0,  
-        //   description: "",
-        //   is_active: true
-        // });
-        
-
+        setForm({
+          title: "",
+          price: 0,
+          county: "",
+          type: "",
+          amenities: [],
+          files: [],
+          location: { lat: null, lng: null, address: "", county: "" },
+          houseType: "",
+          media: [],
+          is_active: true,
+        });
+      } else {
+        toast.error("Failed to create listing. The server did not return a valid response.");
       }
     } catch (error) {
       toast.error(error instanceof Error ? `Error: ${error.message}` : 'An unexpected error occurred.');
@@ -119,11 +124,11 @@ export default function AddListingPage() {
   };
 
   return (
-    <div className="p-8 text-black">
-      <h1 className="text-2xl font-bold mb-6">Create New Listing</h1>
-      <div className="flex flex-col md:flex-row gap-8">
+    <div className="p-4 md:p-8 text-black max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">Create New Listing</h1>
+      <div className="flex flex-col lg:flex-row gap-8">
         <ListingDetailsForm form={form} setForm={setForm} />
-        <ListingMediaSection form={form} setForm={setForm} onSubmit={handleSubmit} />
+        <ListingMediaSection form={form} setForm={setForm} onSubmit={handleSubmit} isSubmitting={isSubmitting} />
       </div>
     </div>
   );

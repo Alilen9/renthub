@@ -8,21 +8,17 @@ import { apiFetch } from "./api";
  * @returns A promise that resolves to an array of apartments.
  */
 export async function fetchApartments(limit?: number): Promise<Apartment[]> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const url = new URL(`${apiUrl}/api/houses`);
-    if (limit) {
-        url.searchParams.append('limit', String(limit));
-    }
+    const path = limit ? `/api/houses?limit=${limit}` : "/api/houses";
 
     try {
-        const response = await fetch(url.toString());
-        if (!response.ok) {
-            throw new Error('Failed to fetch apartments');
-        }
-        const result = await response.json();
+        const result = await apiFetch<{ data: any[] }>(path);
         return result.data.map((apartment: any) => ({
             ...apartment,
-            image_urls: typeof apartment.image_urls === 'string' ? JSON.parse(apartment.image_urls) : apartment.image_urls || [],
+            // Ensure image_urls is always an array
+            image_urls:
+                typeof apartment.image_urls === "string"
+                    ? JSON.parse(apartment.image_urls)
+                    : apartment.image_urls || [],
         }));
     } catch (error) {
         console.error("Error fetching apartments:", error);
@@ -30,21 +26,18 @@ export async function fetchApartments(limit?: number): Promise<Apartment[]> {
     }
 }
 export async function fetchListings(limit?: number): Promise<Apartment[]> {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const url = new URL(`${apiUrl}/api/houses`);
-    if (limit) {
-        url.searchParams.append('limit', String(limit));
-    }
+    const path = limit ? `/api/houses?limit=${limit}` : "/api/houses";
 
     try {
-        const response = await fetch(url.toString());
-        if (!response.ok) {
-            throw new Error('Failed to fetch apartments');
-        }
-        const result = await response.json();
+        // Using apiFetch to include authentication headers
+        const result = await apiFetch<{ data: any[] }>(path);
         return result.data.map((apartment: any) => ({
             ...apartment,
-            image_urls: typeof apartment.image_urls === 'string' ? JSON.parse(apartment.image_urls) : apartment.image_urls || [],
+            // Ensure image_urls is always an array
+            image_urls:
+                typeof apartment.image_urls === "string"
+                    ? JSON.parse(apartment.image_urls)
+                    : apartment.image_urls || [],
         }));
     } catch (error) {
         console.error("Error fetching apartments:", error);
@@ -53,14 +46,14 @@ export async function fetchListings(limit?: number): Promise<Apartment[]> {
 }
 
 export const createListing = async (formData: FormData): Promise<Apartment> => {
-  const data = await apiFetch<{ apartment: Apartment }>(
+  const data = await apiFetch<{ data: Apartment }>(
     '/api/houses',
     {
       method: 'POST',
       body: formData,
     }
   );
-  return data.apartment;
+  return data.data;
 };
 
 export const updateListing = async (id: string, formData: FormData): Promise<Apartment> => {
