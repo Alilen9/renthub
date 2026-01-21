@@ -1,16 +1,16 @@
-// src/app/tenant/TenantDashboard.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
 import { listings } from "@/lib/mockData";
-import ListingCard from "@/components/landlord/ListingCard";
+import { useRouter } from "next/navigation";
+
 import SearchFilters, { Filters } from "@/components/tenants/SearchFilters";
 import PropertyMap from "@/components/tenants/PropertyMap";
 import { useAuth } from "@/context/AuthContext";
 import { fetchApartments } from "@/services/houseService";
 import { Apartment } from "@/utils";
 import { Search } from "lucide-react";
+import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 export default function TenantDashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -52,10 +52,11 @@ export default function TenantDashboard() {
   });
 
   return (
-    <div className="flex min-h-screen">
-      
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      {/* <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} /> */}
 
-      {/* Main Content */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Top Navbar */}
         <header className="flex justify-between items-center bg-white px-6 py-4 shadow-sm relative ">
@@ -81,11 +82,7 @@ export default function TenantDashboard() {
               <div className="relative">
                 <button
                   onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
-                    showFilterDropdown
-                      ? "bg-red-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${showFilterDropdown ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
                   aria-expanded={showFilterDropdown}
                 >
                   <span>Filters</span>
@@ -98,11 +95,7 @@ export default function TenantDashboard() {
                     </div>
                     <button
                       onClick={() => setShowMap(!showMap)}
-                      className={`flex items-center w-full justify-center px-4 py-2 rounded transition-colors ${
-                        showMap
-                          ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
-                          : "bg-red-600 text-white hover:bg-red-700"
-                      }`}
+                      className={`flex items-center w-full justify-center px-4 py-2 rounded transition-colors ${showMap ? "bg-gray-300 text-gray-800 hover:bg-gray-400" : "bg-red-600 text-white hover:bg-red-700"}`}
                     >
                       {showMap ? "Hide Map View" : "Show Map View"}
                     </button>
@@ -114,22 +107,40 @@ export default function TenantDashboard() {
           </div>
         </header>
 
-        {/* Dashboard Content */}
+        {/* Content */}
         <main className="p-6 flex-1 overflow-y-auto">
-          
+          {/* Notices banner (both modes) */}
+          {unreadNotices.length > 0 && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-6 rounded shadow flex justify-between items-center">
+              <p className="text-yellow-800 font-medium">You have {unreadNotices.length} unread notice{unreadNotices.length > 1 ? "s" : ""}!</p>
+              <div className="flex gap-2">
+                <a href="/tenant/notices" className="underline text-yellow-900 hover:text-yellow-700">View Notices</a>
+                <button onClick={() => unreadNotices.forEach(n => toggleReadNotice(n.id))} className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Mark all read</button>
+              </div>
+            </div>
+          )}
+
+          {/* MODE: Searching (not resident) */}
+          {!isResident && (
             <>
+              {/* Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div className="bg-white p-6 rounded-lg shadow cursor-pointer hover:shadow-lg transition" onClick={() => router.push("/tenant/saved-properties")}>
                   <h3 className="text-gray-500">Saved Properties</h3>
-                  <p className="text-2xl font-bold text-red-700">12</p>
+                  <p className="text-2xl font-bold text-red-700">{savedProperties.length}</p>
+                  {savedProperties.length === 0 && <p className="text-sm text-gray-400 mt-1">No saved properties yet</p>}
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
+
+                <div className="bg-white p-6 rounded-lg shadow cursor-pointer hover:shadow-lg transition" onClick={() => router.push("/tenant/applications")}>
                   <h3 className="text-gray-500">Applications</h3>
-                  <p className="text-2xl font-bold text-red-700">5</p>
+                  <p className="text-2xl font-bold text-red-700">{applications.length}</p>
+                  {applications.length === 0 && <p className="text-sm text-gray-400 mt-1">No applications submitted</p>}
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
+
+                <div className="bg-white p-6 rounded-lg shadow cursor-pointer hover:shadow-lg transition" onClick={() => router.push("/tenant/chat")}>
                   <h3 className="text-gray-500">Messages</h3>
-                  <p className="text-2xl font-bold text-red-700">8</p>
+                  <p className="text-2xl font-bold text-red-700">{unreadMessages.length}</p>
+                  {unreadMessages.length === 0 && <p className="text-sm text-gray-400 mt-1">All messages read</p>}
                 </div>
               </div>
 
@@ -167,54 +178,6 @@ export default function TenantDashboard() {
           
         </main>
       </div>
-
-      {/* View Modal */}
-      {showViewModal && selectedListing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <h2 className="text-xl font-bold mb-4">{selectedListing.title}</h2>
-            <img
-              src={selectedListing.images[0]}
-              alt={selectedListing.title}
-              className="w-full h-48 object-cover rounded mb-4"
-            />
-            <p className="text-gray-600">{selectedListing.description}</p>
-            <p className="mt-2 text-red-700 font-semibold">
-              Ksh {selectedListing.price.toLocaleString()}
-            </p>
-            <button
-              onClick={() => router.push(`/tenant/listing/${selectedListing.id}`)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Explore
-            </button>
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-700"
-              onClick={() => setShowViewModal(false)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Analytics Modal */}
-      {showAnalyticsModal && selectedListing && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <h2 className="text-xl font-bold mb-4">Analytics: {selectedListing.title}</h2>
-            <p className="text-gray-600">📊 Views: 120</p>
-            <p className="text-gray-600">⭐ Interested: 45</p>
-            <p className="text-gray-600">✅ Applications: 10</p>
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-red-700"
-              onClick={() => setShowAnalyticsModal(false)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

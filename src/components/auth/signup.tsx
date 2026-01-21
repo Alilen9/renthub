@@ -1,9 +1,14 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, JSX } from "react";
+import { toast } from "react-hot-toast";
 import { registerUser } from "@/services/authService";
 import { RegisterFormData } from "@/utils/auth";
-import { toast } from "react-hot-toast";
+import { FiCamera, FiUpload, FiCheckCircle, FiCreditCard, FiUser } from "react-icons/fi";
+import { motion } from "framer-motion";
+
+type RoleType = "tenant" | "landlord" | "serviceProvider";
+type KycStep = 1 | 2 | 3;
 
 export default function SignupForm({
   onLogin,
@@ -12,18 +17,18 @@ export default function SignupForm({
   onLogin: () => void;
   onSuccess: () => void;
 }) {
-  const [role, setRole] = useState<"tenant" | "landlord">("tenant");
-  const [kycStep, setKycStep] = useState<0 | 1 | 2 | 3>(0);
+  const [role, setRole] = useState<RoleType>("tenant");
+  const [kycStep, setKycStep] = useState<KycStep | 0>(0);
+  const [underReview, setUnderReview] = useState(false);
   const [formData, setFormData] = useState<RegisterFormData>({
     full_name: "",
     email: "",
     password: "",
     phone: "",
-    username: "", // will be set to email
+    username: "",
   });
-  const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [useCamera, setUseCamera] = useState(false);
-  const [underReview, setUnderReview] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -63,62 +68,74 @@ export default function SignupForm({
     try {
       setUseCamera(true);
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      toast.error("Camera access denied or not available.");
+      if (videoRef.current) videoRef.current.srcObject = stream;
+    } catch {
+      toast.error("Camera access denied or unavailable.");
       setUseCamera(false);
     }
   };
 
-  // Capture photo & stop camera
   const capturePhoto = () => {
     if (!videoRef.current) return;
-
     const canvas = document.createElement("canvas");
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext("2d");
+    if (ctx) ctx.drawImage(videoRef.current, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) setFile(new File([blob], `kyc-step-${kycStep}.png`, { type: "image/png" }));
+    });
 
-    if (ctx) {
-      ctx.drawImage(videoRef.current, 0, 0);
-      setPreview(canvas.toDataURL("image/png"));
-    }
-
-    // Stop camera after capture
     const stream = videoRef.current.srcObject as MediaStream | null;
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-    videoRef.current.srcObject = null;
+    if (stream) stream.getTracks().forEach((t) => t.stop());
+    if (videoRef.current) videoRef.current.srcObject = null;
     setUseCamera(false);
   };
 
-  // Continue to next KYC step
-  const handleNextStep = () => {
-    setPreview(null);
-    setUseCamera(false);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
+  };
 
-    if (kycStep < 3) {
-      setKycStep((prev) => (prev + 1) as typeof kycStep);
-    } else {
-      setUnderReview(true); // Final step → under review
+  const handleNextStep = () => {
+    if (!file) {
+      toast.error("Please upload or capture your document.");
+      return;
+    }
+    setFile(null); // clear for next step
+    if (kycStep < 3) setKycStep((prev) => (prev + 1) as KycStep);
+    else setUnderReview(true);
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (role === "tenant") {
+        await registerUser({ ...formData, username: formData.email }, role);
+        toast.success("Account created! Please log in.");
+        onSuccess();
+      } else {
+        setKycStep(1); // Start KYC for landlord/service provider
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Unexpected error.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // --- Under Review ---
   if (underReview) {
     return (
-      <div className="space-y-4 text-center">
-        <h2 className="text-xl font-semibold text-black">
-          Verification Under Review
-        </h2>
-        <p className="text-sm text-gray-600">
-          Your documents and selfie have been submitted. Our team is reviewing
-          them. Once approved, you’ll be able to log in as a landlord.
+      <div className="space-y-6 text-center p-6 bg-white rounded-2xl shadow-md w-full max-w-md mx-auto">
+        <FiCheckCircle className="mx-auto text-green-500" size={60} />
+        <h2 className="text-xl font-semibold">Verification Under Review</h2>
+        <p className="text-gray-600 text-sm">
+          Your documents and selfie have been submitted. Our team will review them.
         </p>
-
         <button
           onClick={onLogin}
           className="mt-4 w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
@@ -129,104 +146,114 @@ export default function SignupForm({
     );
   }
 
-  // --- KYC Steps ---
+  // --- KYC Wizard ---
   if (kycStep > 0) {
-    const stepTitles: Record<1 | 2 | 3, string> = {
-      1: "Step 1: Upload or Capture ID (Front)",
-      2: "Step 2: Upload or Capture ID (Back)",
-      3: "Step 3: Capture a Selfie",
+    const stepTitles: Record<KycStep, string> = {
+      1: "ID Front",
+      2: "ID Back",
+      3: "Selfie",
+    };
+
+    const stepIcons: Record<KycStep, JSX.Element> = {
+      1: <FiCreditCard size={24} />,
+      2: <FiCreditCard size={24} />,
+      3: <FiUser size={24} />,
     };
 
     return (
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-black">
-          {stepTitles[kycStep as 1 | 2 | 3]}
-        </h2>
-        <p className="text-sm text-gray-600">
-          {kycStep === 3
-            ? "Take a clear selfie in a well-lit area."
-            : "Provide a clear image for verification."}
-        </p>
+      <div className="space-y-6 p-6 bg-white rounded-2xl shadow-md w-full max-w-md mx-auto">
+        {/* Step Indicators */}
+        <div className="flex justify-between mb-4">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="flex-1 flex flex-col items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 transition ${
+                  s <= kycStep ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-600"
+                }`}
+              >
+                {s}
+              </div>
+              <span className="text-xs text-center">{stepTitles[s as KycStep]}</span>
+            </div>
+          ))}
+        </div>
 
-        {/* Upload Option */}
-        {!useCamera && (
-          <div className="space-y-3">
-            <input
-              type="file"
-              accept="image/*"
-              capture={kycStep === 3 ? "user" : "environment"}
-              onChange={handleFileChange}
-              className="w-full px-4 py-2 border border-black text-black rounded-lg"
-            />
-            <button
-              type="button"
-              onClick={startCamera}
-              className="w-full py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300"
-            >
-              Use Camera Instead
-            </button>
-          </div>
-        )}
-
-        {/* Camera View */}
-        {useCamera && (
-          <div className="space-y-3">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full h-48 object-cover border border-black rounded-lg"
-            />
-            <button
-              type="button"
-              onClick={capturePhoto}
-              className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              Capture Photo
-            </button>
-          </div>
-        )}
-
-        {/* Preview */}
-        {preview && (
-          <div className="space-y-3">
-            <p className="text-sm text-black">Preview:</p>
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-full h-48 object-cover border border-black rounded-lg"
-            />
-            {/* Allow retake */}
-            <button
-              type="button"
-              onClick={startCamera}
-              className="w-full py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300"
-            >
-              Retake Photo
-            </button>
-          </div>
-        )}
-
-        {/* Continue */}
-        <button
-          type="button"
-          onClick={handleNextStep}
-          disabled={!preview}
-          className={`w-full py-2 rounded-lg transition ${
-            preview
-              ? "bg-indigo-600 text-white hover:bg-indigo-700"
-              : "bg-gray-300 text-gray-600 cursor-not-allowed"
-          }`}
+        <motion.div
+          key={kycStep}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="flex flex-col gap-4"
         >
-          {kycStep < 3 ? "Continue" : "Finish Verification"}
-        </button>
+          <div className="text-center flex flex-col items-center gap-2 mb-4">
+            {stepIcons[kycStep as KycStep]}
+            <p className="text-sm text-gray-600">
+              {kycStep === 3
+                ? "Take a clear selfie in a well-lit area."
+                : "Upload a clear image for verification."}
+            </p>
+          </div>
+
+          {/* Upload Section */}
+          {!useCamera && (
+            <div className="flex flex-col gap-3">
+              <label className="flex flex-col items-center justify-center border border-dashed border-gray-400 p-6 rounded-lg cursor-pointer hover:bg-gray-50 w-full text-black">
+                <FiUpload size={24} className="mb-2" />
+                <span className="text-sm">Click or drag file to upload</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+              </label>
+              <button
+                type="button"
+                onClick={startCamera}
+                className="w-full py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 flex items-center justify-center gap-2"
+              >
+                <FiCamera /> Use Camera
+              </button>
+            </div>
+          )}
+
+          {/* Camera Section */}
+          {useCamera && (
+            <div className="flex flex-col gap-3">
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="w-full h-48 object-cover border border-black rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={capturePhoto}
+                className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Capture Photo
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleNextStep}
+            className={`w-full py-2 rounded-lg transition ${
+              file
+                ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                : "bg-gray-300 text-gray-600 cursor-not-allowed"
+            }`}
+            disabled={!file}
+          >
+            {kycStep < 3 ? "Continue" : "Finish Verification"}
+          </button>
+        </motion.div>
       </div>
     );
   }
 
-  // --- Normal Signup ---
+  // --- Signup Form ---
   return (
-    <form onSubmit={handleSignup} className="space-y-4">
+    <form
+      onSubmit={handleSignup}
+      className="space-y-4 p-6 bg-white rounded-2xl shadow-md w-full max-w-md mx-auto"
+    >
       <h2 className="text-xl font-semibold text-black">Create Account</h2>
       <input
         type="text"
@@ -235,7 +262,7 @@ export default function SignupForm({
         value={formData.full_name}
         onChange={handleInputChange}
         required
-        className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
+        className="w-full px-4 py-2 border border-black text-black rounded-lg"
       />
       <input
         type="email"
@@ -244,7 +271,7 @@ export default function SignupForm({
         value={formData.email}
         onChange={handleInputChange}
         required
-        className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
+        className="w-full px-4 py-2 border border-black text-black rounded-lg"
       />
       <input
         type="tel"
@@ -262,17 +289,17 @@ export default function SignupForm({
         onChange={handleInputChange}
         required
         minLength={6}
-        className="w-full px-4 py-2 border border-black text-black placeholder-black rounded-lg"
+        className="w-full px-4 py-2 border border-black text-black rounded-lg"
       />
 
-      {/* Role Selection */}
+      {/* Role */}
       <div className="flex gap-4 text-black">
         <label className="flex items-center gap-2">
           <input
             type="radio"
             value="tenant"
             checked={role === "tenant"}
-            onChange={(e) => setRole(e.target.value as "tenant" | "landlord")}
+            onChange={(e) => setRole(e.target.value as RoleType)}
           />
           Tenant
         </label>
@@ -281,27 +308,32 @@ export default function SignupForm({
             type="radio"
             value="landlord"
             checked={role === "landlord"}
-            onChange={(e) => setRole(e.target.value as "tenant" | "landlord")}
+            onChange={(e) => setRole(e.target.value as RoleType)}
           />
           Landlord
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="radio"
+            value="serviceProvider"
+            checked={role === "serviceProvider"}
+            onChange={(e) => setRole(e.target.value as RoleType)}
+          />
+          Service Provider
         </label>
       </div>
 
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-indigo-400"
+        className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-300"
       >
         {isLoading ? 'Creating...' : ('Create Account')}
       </button>
 
       <p className="text-sm text-center text-black">
         Already have an account?{" "}
-        <button
-          type="button"
-          onClick={onLogin}
-          className="text-black hover:underline"
-        >
+        <button type="button" onClick={onLogin} className="text-black hover:underline">
           Login
         </button>
       </p>

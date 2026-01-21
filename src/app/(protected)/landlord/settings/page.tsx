@@ -99,7 +99,7 @@ export default function LandlordSettingsPage() {
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
               />
             </div>
 
@@ -110,7 +110,7 @@ export default function LandlordSettingsPage() {
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
               />
             </div>
 
@@ -121,7 +121,7 @@ export default function LandlordSettingsPage() {
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
               />
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function LandlordSettingsPage() {
                 name="password"
                 value={form.password}
                 onChange={handleChange}
-                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
               />
             </div>
 
@@ -151,7 +151,7 @@ export default function LandlordSettingsPage() {
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}
-                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none"
+                className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
               />
             </div>
           </div>

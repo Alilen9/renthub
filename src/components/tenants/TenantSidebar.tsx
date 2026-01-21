@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   FiHome,
@@ -10,7 +8,13 @@ import {
   FiLogOut,
   FiKey,
   FiCalendar,
+  FiAlertCircle,
+  FiFile,
+  FiAlertTriangle,
+  FiBarChart2,
+  FiBell,
 } from "react-icons/fi";
+
 import { LayoutDashboard, Users, Gift, Wallet, BarChart, Settings } from "lucide-react";
 import { colors } from "@/utils/colors";
 
@@ -24,17 +28,29 @@ type SidebarProps = {
 
 function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
   const router = useRouter();
-  const pathname = usePathname();
-  const encodedListing = encodeURIComponent("Unit 4B - Riverwalk Lofts");
-  const navItems = [
-      { name: 'Dashboard', href: '/tenant/dashboard', icon: FiHome },
-      { name: 'Fianlize-MoveIn', href: '/tenant/booking-system', icon: FiKey },
-      { name: 'Booking', href: `/tenant/booking-system?listing=${encodedListing}`, icon: FiCalendar },
-      { name: 'Messages', href: '/tenant/chat', icon: FiMessageSquare },
-      { name: 'Support', href: '/tenant/support', icon: FiMessageSquare },
-      { name: 'Settings', href: '/tenant/settings', icon: Settings },
+
+  const menuItems = [
+    { name: "Dashboard", icon: <FiHome />, path: "/tenant/dashboard" },
+    { name: "Finalize Move-in", icon: <FiKey />, path: "/tenant/lease-finalization/BKG12345" },
+    { name: "Book a Viewing", icon: <FiCalendar />, path: "/tenant/booking-system" },
+    { name: "Report Fault", icon: <FiAlertCircle />, path: "/tenant/maintainance" },
+    { name: "Messages", icon: <FiMessageSquare />, path: "/tenant/chat" },
+    { name: "Notices", icon: <FiBell />, path: "/tenant/notices" },
+    { name: "Complain", icon: <FiAlertTriangle />, path: "/tenant/complain" },
+    { name: "TenantAnalytics", icon: <FiBarChart2 />, path: "/tenant/TenantAnalytics" },
+    { name: "Fairnesspolicy", icon: <FiFile />, path: "/tenant/fairness" },
+
+
+ { name: "Settings", icon: <FiSettings />, path: "/tenant/settings" },
+    
+
+   
   ];
-  const [activeMenu, setActiveMenu] = useState("Dashboard");
+
+  const handleClick = (item: typeof menuItems[0]) => {
+    setActiveMenu(item.name);
+    router.push(item.path);
+  };
 
   return (
     <nav

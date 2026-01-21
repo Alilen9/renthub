@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 
@@ -16,12 +16,19 @@ type View = "login" | "signup" | "forgot" | "success";
 
 export default function AuthModal({
   open,
+  mode = "login", // default
   onClose,
 }: {
   open: boolean;
+  mode?: View;
   onClose: () => void;
 }) {
-  const [view, setView] = useState<View>("login");
+  const [view, setView] = useState<View>(mode);
+
+  // Update view when modal opens
+  useEffect(() => {
+    if (open) setView(mode);
+  }, [open, mode]);
 
   return (
     <AnimatePresence>
@@ -32,7 +39,6 @@ export default function AuthModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          {/* Card */}
           <motion.div
             className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative"
             initial={{ y: -50, opacity: 0 }}
@@ -56,7 +62,6 @@ export default function AuthModal({
               <SuccessPopup onDone={() => setView("login")} />
             )}
 
-            {/* Close Btn */}
             <button
               onClick={onClose}
               className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"

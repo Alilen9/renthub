@@ -138,7 +138,7 @@ function ChatBubble({
         className={`max-w-xs md:max-w-md lg:max-w-lg p-3 rounded-xl shadow-sm ${
           isUser
             ? "bg-[#C81E1E] text-white rounded-br-none"
-            : "bg-gray-200 text-gray-800 rounded-bl-none"
+            : "bg-[#f1f1f1] text-gray-800 rounded-bl-none"
         }`}
       >
         <p className="text-sm break-words">{message.content}</p>
@@ -186,7 +186,7 @@ function ChatInput({ onSend, onTyping }: { onSend: (message: string) => void, on
       <input
         type="text"
         placeholder="Type your message..."
-        className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#C81E1E] text-gray-700"
+        className="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#C81E1E] text-gray-700 bg-white"
         value={input}
         onChange={handleInputChange}
         onKeyDown={(e) => e.key === "Enter" && handleSend()}

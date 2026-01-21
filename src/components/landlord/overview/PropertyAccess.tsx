@@ -16,7 +16,7 @@ export default function PropertyAccess({ listings, views = {} }: Props) {
     <div className="bg-white rounded-2xl p-6 shadow-md">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold"> Property Quick Access</h2>
+        <h2 className="text-lg font-semibold text-black"> Property Quick Access</h2>
         <Link href="/landlord/property" className="text-sm text-blue-600 hover:underline">
           View All →
         </Link>
@@ -64,11 +64,12 @@ export default function PropertyAccess({ listings, views = {} }: Props) {
         </div>
       ) : (
         <p className="text-gray-500">
-          No properties yet.{" "}
-          <Link href="/landlord/properties/create" className="text-blue-600 underline">
-            Add one now
-          </Link>
-        </p>
+  No properties yet.{" "}
+  <Link href="/landlord/add-listing" className="text-blue-600 underline">
+    Add one now
+  </Link>
+</p>
+
       )}
     </div>
   );
