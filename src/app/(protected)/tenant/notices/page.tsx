@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FiFile } from "react-icons/fi";
+import Image from "next/image";
 import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 // --- Notice Types ---
@@ -41,7 +42,7 @@ type Tenant = {
 export default function TenantNotices() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [tenant, setTenant] = useState<Tenant | null>({
+  const [tenant] = useState<Tenant | null>({
     id: "tenant_1",
     name: "Alice",
     properties: [
@@ -49,7 +50,6 @@ export default function TenantNotices() {
       { id: "prop_2", name: "Green Villas", managerApproved: true },
     ],
   });
-  const [activeMenu, setActiveMenu] = useState("Notice");
   const tenantId = tenant?.id || "tenant_1";
 
   // Load notices from localStorage
@@ -76,7 +76,7 @@ export default function TenantNotices() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-     
+      <TenantSidebar />
 
       {/* Main Content */}
       <div className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto">
@@ -169,10 +169,11 @@ export default function TenantNotices() {
                         {n.files.map((file, idx) => {
                           if (file.type.startsWith("image/") && file.dataUrl) {
                             return (
-                              <img
+                              <Image
                                 key={idx}
                                 src={file.dataUrl}
                                 alt={file.name}
+                                width={112} height={112}
                                 className="w-28 h-28 object-cover rounded-xl border"
                               />
                             );

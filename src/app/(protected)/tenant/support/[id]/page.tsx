@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { LifeBuoy, Send, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
-import { fetchTicketById, replyToTicket, SupportTicketWithMessages, SupportMessage } from '@/services/supportService';
+import { Send, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
+import { fetchTicketById, replyToTicket, SupportTicketWithMessages } from '@/services/supportService';
 import { useAuth } from '@/context/AuthContext';
 
 function getStatusClass(status: SupportTicketWithMessages['status']) {
@@ -19,7 +19,6 @@ function getStatusClass(status: SupportTicketWithMessages['status']) {
 export default function TicketDetailPage() {
     const { ticketId } = useParams();
     const { user } = useAuth();
-    const router = useRouter();
     const [ticket, setTicket] = useState<SupportTicketWithMessages | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -34,7 +33,7 @@ export default function TicketDetailPage() {
                     setIsLoading(true);
                     const data = await fetchTicketById(ticketId as string);
                     setTicket(data);
-                } catch (err: any) {
+                } catch (err: unknown) {
                     setError('Failed to load ticket details. It may not exist or you may not have permission to view it.');
                     console.error(err);
                 } finally {
@@ -56,8 +55,8 @@ export default function TicketDetailPage() {
             const { message: newMsg } = await replyToTicket(ticketId as string, reply);
             setTicket(prev => prev ? { ...prev, messages: [...prev.messages, newMsg], status: 'open' } : null);
             setReply('');
-        } catch (err: any) {
-            alert(`Error sending reply: ${err.message}`);
+        } catch (err: unknown) {
+            alert(`Error sending reply: ${(err as Error).message}`);
         } finally {
             setIsReplying(false);
         }
@@ -130,4 +129,3 @@ export default function TicketDetailPage() {
         </div>
     );
 }
-

@@ -87,8 +87,8 @@ export default function SignupForm({
       try {
         await registerUser({ ...formData, username: formData.email }, role);
         setUnderReview(true);
-      } catch (err: any) {
-        toast.error(err.message || "Registration failed.");
+      } catch (err: unknown) {
+        toast.error((err as Error).message || "Registration failed.");
       } finally {
         setIsLoading(false);
       }
@@ -107,8 +107,8 @@ export default function SignupForm({
       } else {
         setKycStep(1); // Start KYC for landlord/service provider
       }
-    } catch (err: any) {
-      toast.error(err.message || "Unexpected error.");
+    } catch (err: unknown) {
+      toast.error((err as Error).message || "Unexpected error.");
     } finally {
       setIsLoading(false);
     }

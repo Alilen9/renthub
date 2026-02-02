@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { 
-  Home, PlusCircle, LogOut, Building, CreditCard, Settings, Users, Wrench, Bell, 
+  Home, LogOut, Building, CreditCard, Settings, Users, Wrench, Bell, 
   FileText, Briefcase
 } from "lucide-react"; // added Bell icon for Notices
 import { useRouter } from "next/navigation";

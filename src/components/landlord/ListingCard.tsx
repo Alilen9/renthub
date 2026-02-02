@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { ListingFile } from "./types";
 import { Trash2, Eye } from "lucide-react";
 
@@ -35,10 +36,11 @@ export default function ListingCard({
               className="w-full h-full object-cover"
             />
           ) : (
-            <img
-              src={primaryMedia.url}
+            <Image
+              src={primaryMedia.url || ""}
               alt={primaryMedia.name}
               className="w-full h-full object-cover"
+              width={400} height={200}
             />
           )
         ) : (

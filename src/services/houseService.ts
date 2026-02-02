@@ -2,6 +2,10 @@
 import { Apartment } from "@/utils";
 import { apiFetch } from "./api";
 
+type RawApartment = Omit<Apartment, "image_urls"> & {
+    image_urls: string | string[];
+};
+
 /**
  * Fetches a list of apartments from the API.
  * @param limit The maximum number of apartments to fetch.
@@ -11,15 +15,15 @@ export async function fetchApartments(limit?: number): Promise<Apartment[]> {
     const path = limit ? `/api/houses?limit=${limit}` : "/api/houses";
 
     try {
-        const result = await apiFetch<{ data: any[] }>(path);
-        return result.data.map((apartment: any) => ({
+        const result = await apiFetch<{ data: RawApartment[] }>(path);
+        return result.data.map((apartment) => ({
             ...apartment,
             // Ensure image_urls is always an array
             image_urls:
                 typeof apartment.image_urls === "string"
                     ? JSON.parse(apartment.image_urls)
                     : apartment.image_urls || [],
-        }));
+        })) as Apartment[];
     } catch (error) {
         console.error("Error fetching apartments:", error);
         return []; // Return an empty array on error
@@ -30,15 +34,15 @@ export async function fetchListings(limit?: number): Promise<Apartment[]> {
 
     try {
         // Using apiFetch to include authentication headers
-        const result = await apiFetch<{ data: any[] }>(path);
-        return result.data.map((apartment: any) => ({
+        const result = await apiFetch<{ data: RawApartment[] }>(path);
+        return result.data.map((apartment) => ({
             ...apartment,
             // Ensure image_urls is always an array
             image_urls:
                 typeof apartment.image_urls === "string"
                     ? JSON.parse(apartment.image_urls)
                     : apartment.image_urls || [],
-        }));
+        })) as Apartment[];
     } catch (error) {
         console.error("Error fetching apartments:", error);
         return []; // Return an empty array on error

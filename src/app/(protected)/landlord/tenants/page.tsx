@@ -10,7 +10,6 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Legend,
 } from "recharts";
 import {
   Search,
@@ -270,7 +269,8 @@ export default function TenantManagementPage() {
     const rows = tenants.map((t) =>
       headers
         .map((h) => {
-          const val: any = (t as any)[h === "email" ? "contactEmail" : h === "phone" ? "contactPhone" : h];
+          const key = (h === "email" ? "contactEmail" : h === "phone" ? "contactPhone" : h) as keyof Tenant;
+          const val = t[key];
           return typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val ?? "";
         })
         .join(",")
@@ -373,7 +373,7 @@ export default function TenantManagementPage() {
 
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value as PaymentStatus | "All")}
             className={`p-2 rounded-xl border ${dark ? "bg-gray-800 border-gray-700 text-gray-100" : "bg-white"}`}
           >
             <option value="All">All statuses</option>

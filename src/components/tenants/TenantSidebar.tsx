@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   FiHome,
   FiMessageSquare,
@@ -18,14 +18,9 @@ import {
 
 import { colors } from "@/utils/colors";
 
-// ---------------- Sidebar ----------------
-type SidebarProps = {
-  activeMenu: string;
-  setActiveMenu: (menu: string) => void;
-};
 
 function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
-  const router = useRouter();
+  
   const pathname = usePathname();
 
   const menuItems = [

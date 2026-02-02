@@ -13,7 +13,7 @@ interface DashboardMainProps {
   setListings: React.Dispatch<React.SetStateAction<ListingDraft[]>>;
 }
 
-export default function DashboardMain({ listings, setListings }: DashboardMainProps) {
+export default function DashboardMain({ listings }: DashboardMainProps) {
   const router = useRouter();
 
   return (

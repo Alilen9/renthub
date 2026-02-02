@@ -4,9 +4,22 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import { Send } from "lucide-react";
 
+type Message = {
+  sender: string;
+  text: string;
+  time: string;
+  date: string;
+};
+
+type Chat = {
+  id: string;
+  name: string;
+  chat: Message[];
+};
+
 export default function ChatPage() {
   const { tenantId } = useParams();
-  const [chat, setChat] = useState<any>(null);
+  const [chat, setChat] = useState<Chat | null>(null);
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -20,8 +33,8 @@ export default function ChatPage() {
   useEffect(() => {
     const saved = localStorage.getItem("tenant_inquiries");
     if (saved) {
-      const list = JSON.parse(saved);
-      const tenant = list.find((q: any) => q.id === tenantId);
+      const list: Chat[] = JSON.parse(saved);
+      const tenant = list.find((q) => q.id === tenantId);
       if (tenant) setChat(tenant);
     }
   }, [tenantId]);
@@ -32,7 +45,7 @@ export default function ChatPage() {
   }, [chat]);
 
   const sendMessage = () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !chat) return;
 
     const newMsg = {
       sender: "Landlord",
@@ -69,11 +82,11 @@ export default function ChatPage() {
     }, 1800);
   };
 
-  const updateStorage = (updatedChat: any) => {
+  const updateStorage = (updatedChat: Chat) => {
     const saved = localStorage.getItem("tenant_inquiries");
     if (!saved) return [updatedChat];
-    const list = JSON.parse(saved);
-    return list.map((t: any) => (t.id === updatedChat.id ? updatedChat : t));
+    const list: Chat[] = JSON.parse(saved);
+    return list.map((t) => (t.id === updatedChat.id ? updatedChat : t));
   };
 
   const getAutoReply = (msg: string) => {
@@ -89,8 +102,8 @@ export default function ChatPage() {
   };
 
   // Group messages by date
-  const groupMessagesByDate = (messages: any[]) => {
-    const groups: Record<string, any[]> = {};
+  const groupMessagesByDate = (messages: Message[]) => {
+    const groups: Record<string, Message[]> = {};
     messages.forEach((msg) => {
       if (!groups[msg.date]) groups[msg.date] = [];
       groups[msg.date].push(msg);

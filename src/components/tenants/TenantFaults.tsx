@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { X, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 // ---------------- Types ----------------
 export type FaultMessage = {
@@ -77,7 +77,8 @@ const TUNYCE_YELLOW = "#F4C542";
 export default function TenantDashboard({ tenant }: TenantDashboardProps) {
   // ---------- Role Confirmation ----------
   const [isTenant, setIsTenant] = useState<boolean | null>(null);
-  const [managerConfirmed, setManagerConfirmed] = useState<boolean>(tenant.isManagerConfirmed || false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [managerConfirmed, _setManagerConfirmed] = useState<boolean>(tenant.isManagerConfirmed || false);
 
   // ---------- Fault State ----------
   const [faults, setFaults] = useState<Fault[]>([]);
@@ -88,10 +89,12 @@ export default function TenantDashboard({ tenant }: TenantDashboardProps) {
   const [priority, setPriority] = useState<typeof priorities[number]>("Medium");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
-  const [modalMediaIndex, setModalMediaIndex] = useState<{ urls: string[]; current: number } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [modalMediaIndex, _setModalMediaIndex] = useState<{ urls: string[]; current: number } | null>(null);
   const [replyText, setReplyText] = useState("");
   const [toasts, setToasts] = useState<string[]>([]);
-  const [carouselIndex, setCarouselIndex] = useState<Record<string, number>>({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [carouselIndex, _setCarouselIndex] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("All");
   const [filterCategory, setFilterCategory] = useState<string>("All");
@@ -154,7 +157,8 @@ export default function TenantDashboard({ tenant }: TenantDashboardProps) {
     resetForm();
   };
 
-  const sendReply = (faultId: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _sendReply = (faultId: string) => {
     if (!replyText) return;
     const newMessage: FaultMessage = { sender: "Tenant", content: replyText, timestamp: new Date().toISOString() };
     setFaults(prev => prev.map(f => f.id === faultId ? { ...f, messages: [...(f.messages || []), newMessage] } : f));
@@ -165,9 +169,11 @@ export default function TenantDashboard({ tenant }: TenantDashboardProps) {
     }, 1500);
   };
 
-  const formatDate = (iso: string) => new Date(iso).toLocaleString();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _formatDate = (iso: string) => new Date(iso).toLocaleString();
 
-  const filteredFaults = faults.filter(f => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _filteredFaults = faults.filter(f => {
     const statusMatch = filterStatus === "All" || f.status === filterStatus;
     const categoryMatch = filterCategory === "All" || f.category === filterCategory;
     const priorityMatch = filterPriority === "All" || f.priority === filterPriority;
@@ -175,11 +181,13 @@ export default function TenantDashboard({ tenant }: TenantDashboardProps) {
     return statusMatch && categoryMatch && priorityMatch && searchMatch;
   });
 
-  const nextMedia = (faultId: string, length: number) => {
-    setCarouselIndex(prev => ({ ...prev, [faultId]: prev[faultId] === undefined ? 0 : (prev[faultId] + 1) % length }));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _nextMedia = (faultId: string, length: number) => {
+    _setCarouselIndex(prev => ({ ...prev, [faultId]: prev[faultId] === undefined ? 0 : (prev[faultId] + 1) % length }));
   };
-  const prevMedia = (faultId: string, length: number) => {
-    setCarouselIndex(prev => ({ ...prev, [faultId]: prev[faultId] === undefined ? length - 1 : (prev[faultId] - 1 + length) % length }));
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _prevMedia = (faultId: string, length: number) => {
+    _setCarouselIndex(prev => ({ ...prev, [faultId]: prev[faultId] === undefined ? length - 1 : (prev[faultId] - 1 + length) % length }));
   };
 
   const totalResolved = faults.filter(f => f.status === "Resolved").length;
@@ -284,7 +292,7 @@ export default function TenantDashboard({ tenant }: TenantDashboardProps) {
             <button onClick={() => fileInputRef.current?.click()} className={`px-4 py-2 rounded-lg transition text-black bg-[${TUNYCE_YELLOW}] hover:bg-yellow-300`}>{mediaFiles.length ? "Change Media" : "Attach Media"}</button>
             <input type="file" ref={fileInputRef} multiple accept="image/*,video/*" className="hidden" onChange={e => e.target.files && setMediaFiles(Array.from(e.target.files))}/>
           </div>
-          {mediaPreviews.length > 0 && <div className="flex gap-2 overflow-x-auto">{mediaPreviews.map((url, idx) => <img key={idx} src={url} onClick={() => setModalMediaIndex({ urls: mediaPreviews, current: idx })} className="w-32 h-32 object-cover rounded-lg cursor-pointer"/>)} </div>}
+          {mediaPreviews.length > 0 && <div className="flex gap-2 overflow-x-auto">{mediaPreviews.map((url, idx) => <Image key={idx} src={url} alt="Preview" width={128} height={128} onClick={() => _setModalMediaIndex({ urls: mediaPreviews, current: idx })} className="w-32 h-32 object-cover rounded-lg cursor-pointer"/>)} </div>}
           <button onClick={submitFault} className={`px-6 py-3 rounded-full bg-[${TUNYCE_MAROON}] text-white font-semibold hover:bg-[${TUNYCE_RED}] transition`}>Submit Fault</button>
         </div>
       </div>

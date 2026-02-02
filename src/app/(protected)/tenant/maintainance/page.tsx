@@ -2,11 +2,9 @@
 
 import TenantFaults from "@/components/tenants/TenantFaults";
 import TenantSidebar from "@/components/tenants/TenantSidebar"; // import your sidebar
-import React, { useState } from "react";
+import React from "react";
 
 export default function TenantDashboardPage() {
-  const [activeMenu, setActiveMenu] = useState("Dashboard"); // track active menu
-
   const tenant = {
     id: "1",
     name: "Alice Mkangoma",
@@ -22,7 +20,7 @@ export default function TenantDashboardPage() {
   return (
     <div className="min-h-screen flex bg-gray-50">
       {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+      <TenantSidebar />
 
       {/* Main Content */}
       <div className="flex-1">

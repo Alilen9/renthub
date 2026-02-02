@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
 import { Role } from "@/utils/auth";
@@ -20,15 +19,6 @@ export default function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const router = useRouter();
-
-  // Map roles to correct App Router URLs
-  const roleRoutes: Record<Role, string> = {
-    tenant: "/tenant/dashboard",
-    landlord: "/landlord/dashboard",
-    admin: "/admin/dashboard",
-    service_provider: "/spn/dashboard",
-  };
 
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -50,8 +40,8 @@ export default function LoginForm({
 
       console.log("Login result", result)
 
-    } catch (err: any) {
-      toast.error(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      toast.error((err as Error).message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }

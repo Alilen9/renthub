@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Search, ShieldCheck, MessageCircle, CreditCard, MapPin } from "lucide-react";
 import FeaturedApartments from "./FeaturedApartments";
 import { ContactUsFormData } from "@/utils/contactUs";
@@ -14,14 +13,6 @@ const cityImages = [
   { name: "Kisumu", url: "/images/KISUMU.jpg" },
 ];
 
-// Sample properties
-const sampleProperties = [
-  { id: 1, title: "2BR Apartment in Nairobi", image: "/images/property1.jpg", price: 12000, location: "Nairobi" },
-  { id: 2, title: "Studio in Mombasa", image: "/images/property2.jpg", price: 8000, location: "Mombasa" },
-  { id: 3, title: "3BR Bungalow in Kisumu", image: "/images/property3.jpg", price: 15000, location: "Kisumu" },
-  { id: 4, title: "1BR Flat in Ruiru", image: "/images/property4.jpg", price: 9000, location: "Ruiru" },
-];
-
 // Feature highlights for About Us
 const features = [
   { icon: ShieldCheck, title: "Verified Listings", desc: "Safe, trusted properties" },
@@ -32,7 +23,6 @@ const features = [
 
 export default function LandingPage() {
   const [index, setIndex] = useState(0);
-  const [properties, setProperties] = useState(sampleProperties);
   const [contactForm, setContactForm] = useState<ContactUsFormData>({ full_name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,11 +32,6 @@ export default function LandingPage() {
       setIndex((prev) => (prev + 1) % cityImages.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, []);
-
-  // Randomize properties
-  useEffect(() => {
-    setProperties((prev) => [...prev].sort(() => Math.random() - 0.5));
   }, []);
 
   return (
@@ -166,7 +151,7 @@ export default function LandingPage() {
                   await sendContactInquiry(contactForm);
                   alert(`✅ Inquiry sent successfully!\n\nName: ${contactForm.full_name}\nEmail: ${contactForm.email}`);
                   setContactForm({ full_name: "", email: "", message: "" });
-                } catch (error) {
+                } catch {
                   alert("Failed to send inquiry. Please try again.");
                 } finally {
                   setIsSubmitting(false);

@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   FiPlus,
   FiChevronLeft,
-  FiChevronRight,
   FiUsers,
   FiPhone,
 } from "react-icons/fi";
@@ -235,7 +234,7 @@ export default function ComplaintsPage() {
   return (
     <div className="flex w-full min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <TenantSidebar activeMenu="Complaints" setActiveMenu={() => {}} />
+      <TenantSidebar  />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col p-4 gap-4">
@@ -259,7 +258,7 @@ export default function ComplaintsPage() {
               <select
                 className="p-2 border border-gray-300 rounded-md"
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value as any)}
+                onChange={(e) => setFilterStatus(e.target.value as ComplaintStatus | "All")}
               >
                 <option value="All">All</option>
                 {statusOrder.map((s) => (

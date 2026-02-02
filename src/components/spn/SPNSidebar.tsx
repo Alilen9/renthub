@@ -1,7 +1,6 @@
 "use client";
 
 import { Home, Wrench, Settings, LogOut, FileText, MessageSquare, Wallet, HelpCircle, FileCheck } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation"; // to detect active route
 

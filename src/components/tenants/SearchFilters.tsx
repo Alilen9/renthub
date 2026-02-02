@@ -26,7 +26,7 @@ export default function SearchFilters({
 
   const [open, setOpen] = useState(true);
 
-  const updateFilters = (field: keyof Filters, value: any) => {
+  const updateFilters = (field: keyof Filters, value: Filters[keyof Filters]) => {
     const updated = { ...filters, [field]: value };
     setFilters(updated);
     onChange(updated);

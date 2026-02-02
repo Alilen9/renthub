@@ -66,10 +66,10 @@ export default function ListingMediaSection({
       <div className="pt-4 border-t border-gray-100">
       <PackageSelector
         selected={selectedPackage}
-        onChange={(pkg: any) =>
+        onChange={(pkg: string) =>
           setForm((prev) => ({
             ...prev,
-            package: pkg,
+            package: pkg as "free" | "standard" | "premium",
           }))
         }
       />
