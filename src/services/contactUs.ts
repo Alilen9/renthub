@@ -1,7 +1,7 @@
 import { BaseSuccessResponse, ContactUsFormData } from '@/utils/contactUs';
 import { apiFetch } from '@/services/api';
 
-export const contactUs = async (formData: ContactUsFormData, role: 'tenant' | 'landlord'): Promise<BaseSuccessResponse> => {
+export const contactUs = async (formData: ContactUsFormData): Promise<BaseSuccessResponse> => {
   const endpoint = '/api/contactUs';
   const body = {
     

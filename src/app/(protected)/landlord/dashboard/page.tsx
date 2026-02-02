@@ -5,7 +5,7 @@ import DashboardMain from "@/components/landlord/DashboardMain";
 import { ListingDraft } from "@/components/landlord/types";
 
 export default function DashboardPage() {
-  const [createOpen, setCreateOpen] = useState(false);
+  
   const [listings, setListings] = useState<ListingDraft[]>([]);
 
   useEffect(() => {

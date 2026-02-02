@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
 import { Fault, FaultStatus } from "@/types/fault";
-import { Wrench, CheckCircle, Send, X } from "lucide-react";
+import { Send, X } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 // Tunyce brand colors
@@ -94,7 +95,8 @@ export default function LandlordFaults() {
     return faults.filter(f => f.status === filterStatus);
   }, [filterStatus, faults]);
 
-  const assignServiceProvider = (id: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _assignServiceProvider = (id: string) => {
     const provider = prompt("Enter Service Provider Name (Plumber, Electrician, etc.)");
     if (!provider) return;
     setFaults(faults.map(f =>
@@ -111,13 +113,15 @@ export default function LandlordFaults() {
     ));
   };
 
-  const updateProgress = (id: string, value: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _updateProgress = (id: string, value: number) => {
     setFaults(faults.map(f =>
       f.id === id ? { ...f, serviceProviderProgress: value ?? 0 } : f
     ));
   };
 
-  const resolveFault = (id: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _resolveFault = (id: string) => {
     setFaults(faults.map(f =>
       f.id === id
         ? {
@@ -168,13 +172,15 @@ export default function LandlordFaults() {
     }
   };
 
-  const progressColor = (value: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _progressColor = (value: number) => {
     if (value < 40) return `bg-red-600`;
     if (value < 70) return `bg-yellow-400`;
     return `bg-maroon`;
   };
 
-  const progressLabel = (value: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _progressLabel = (value: number) => {
     if (value === 0) return "Assigned";
     if (value < 50) return "In Progress";
     if (value < 100) return "Almost Done";
@@ -246,10 +252,11 @@ export default function LandlordFaults() {
             </div>
 
             {f.mediaUrl && (
-              <img
+              <Image
                 src={f.mediaUrl}
                 alt="Evidence"
                 className="w-full h-48 object-cover rounded-lg mb-4 cursor-pointer hover:scale-105 transition-transform"
+                width={400} height={200}
                 onClick={() => setModalMedia(f.mediaUrl!)}
               />
             )}
@@ -307,7 +314,7 @@ export default function LandlordFaults() {
                 <source src={modalMedia} type="video/mp4" />
               </video>
             ) : (
-              <img src={modalMedia} alt="Evidence" className="max-h-[80vh] max-w-[80vw] rounded-lg" />
+              <Image src={modalMedia} alt="Evidence" width={800} height={600} className="max-h-[80vh] max-w-[80vw] rounded-lg" />
             )}
           </div>
         </div>

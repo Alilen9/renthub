@@ -37,11 +37,9 @@ const staffContacts = [
 
 // ---------------- Tenant Analytics Page ----------------
 const TenantAnalyticsPage = () => {
-  const [activeMenu, setActiveMenu] = React.useState("Analytics");
-
   return (
     <div className="flex text-black"> {/* Force all text inside to black */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+      <TenantSidebar />
 
       <main className="flex-1 p-6 space-y-10 bg-gray-50 min-h-screen">
         <h1 className="text-3xl font-bold mb-6 text-black">Tenant Analytics Report</h1>
@@ -55,6 +53,7 @@ const TenantAnalyticsPage = () => {
               <XAxis dataKey="month" stroke="#000" /> {/* X-axis labels black */}
               <YAxis stroke="#000" /> {/* Y-axis labels black */}
               <Tooltip
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(_, __, props: any) => {
                   const dataPoint = props?.payload?.[0]?.payload;
                   if (!dataPoint) return ["", ""];
@@ -81,6 +80,7 @@ const TenantAnalyticsPage = () => {
               <XAxis dataKey="title" stroke="#000" />
               <YAxis stroke="#000" />
               <Tooltip
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter={(_, __, props: any) => {
                   const dataPoint = props?.payload?.[0]?.payload;
                   if (!dataPoint) return ["", ""];

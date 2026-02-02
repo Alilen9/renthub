@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       setIsLoading(true);
-      const result = await registerUser(formData, role);
+      await registerUser(formData, role);
       const loginPath = role === 'tenant' ? '/auth/buyer/login' : '/auth/seller/login';
       setTimeout(() => {
         router.push(`${loginPath}?registered=true`);

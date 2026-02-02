@@ -11,13 +11,13 @@ export function getListings() {
   return JSON.parse(localStorage.getItem("listings") || "[]");
 }
 
-export function addPayment(payment: any) {
+export function addPayment(payment: unknown) {
   const p = getPayments();
   p.push(payment);
   localStorage.setItem("payments", JSON.stringify(p));
 }
 
-export function addTransaction(tx: any) {
+export function addTransaction(tx: unknown) {
   const t = getTransactions();
   t.push(tx);
   localStorage.setItem("transactions", JSON.stringify(t));

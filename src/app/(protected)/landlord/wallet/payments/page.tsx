@@ -3,8 +3,16 @@
 import { useEffect, useState } from "react";
 import { getPayments } from "@/lib/storage";
 
+type Payment = {
+  id: string;
+  listingTitle: string;
+  date: string;
+  amount: number | string;
+  method: string;
+};
+
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState<any[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
 
   useEffect(() => setPayments(getPayments()), []);
 

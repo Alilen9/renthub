@@ -33,7 +33,7 @@ export default function SupportPage() {
                 const data = await fetchTenantTickets();
                 console.log("data of tickets:", data);
                 setTickets(data);
-            } catch (err: any) {
+            } catch (err: unknown) {
                 setError('Failed to load support tickets. Please try again later.');
                 console.error(err);
             } finally {
@@ -56,8 +56,8 @@ export default function SupportPage() {
             const { ticket } = await createTicket(subject, message);
             alert('Support ticket created successfully!');
             router.push(`/tenant/support/${ticket.id}`);
-        } catch (err: any) {
-            alert(`Error creating ticket: ${err.message}`);
+        } catch (err: unknown) {
+            alert(`Error creating ticket: ${(err as Error).message}`);
         } finally {
             setIsCreating(false);
         }

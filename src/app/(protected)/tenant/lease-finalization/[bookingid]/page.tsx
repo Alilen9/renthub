@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
+import Image from "next/image";
 
 // ---------------- Types ----------------
 type LeaseFormData = {
@@ -25,7 +25,8 @@ type Property = {
 function MoveInLeaseCard({
   bookingId,
   property,
-  escrowAmount,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  escrowAmount: _escrowAmount,
   onConfirmRelease,
 }: {
   bookingId: string;
@@ -59,7 +60,7 @@ function MoveInLeaseCard({
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Property Preview */}
       <div className="relative h-72 w-full rounded-2xl overflow-hidden shadow-lg border border-gray-200">
-        <img src={property.imageUrl} alt={property.name} className="w-full h-full object-cover" />
+        <Image src={property.imageUrl} alt={property.name} fill className="object-cover" />
         <div className="absolute bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent w-full p-5">
           <h2 className="text-white text-2xl font-semibold">{property.name}</h2>
           <p className="text-gray-300 text-sm">{property.address}</p>

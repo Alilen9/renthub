@@ -3,12 +3,19 @@
 import { getTransactions } from "@/lib/storage";
 import { useEffect, useState } from "react";
 
+type Transaction = {
+  id: string;
+  type: string;
+  amount: number | string;
+  status: string;
+  date: string;
+};
 
 export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filter, setFilter] = useState<string>("all");
 
-  useEffect(() => setTransactions(getTransactions()), []);
+  useEffect(() => setTransactions(getTransactions() as Transaction[]), []);
 
   const filtered = transactions.filter(t => filter === "all" ? true : t.type === filter);
 

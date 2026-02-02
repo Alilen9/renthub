@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { listings } from "@/lib/mockData";
 import {
   Bed,
@@ -14,8 +15,7 @@ import {
   Home,
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import TenantSidebar from "./TenantSidebar";
 
 
@@ -28,11 +28,17 @@ const formatKES = (amount: number) =>
   }).format(amount);
 
 export default function ListingDetailsClient({ id }: { id: string }) {
-  const router = useRouter();
   const listing = listings.find((l) => String(l.id) === id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const [activeMenu, setActiveMenu] = useState("Listings");
+
+  const nextImage = useCallback(() => {
+    if (listing) setCurrentImage((prev) => (prev + 1) % listing.images.length);
+  }, [listing]);
+
+  const prevImage = useCallback(() => {
+    if (listing) setCurrentImage((prev) => (prev - 1 + listing.images.length) % listing.images.length);
+  }, [listing]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -43,7 +49,7 @@ export default function ListingDetailsClient({ id }: { id: string }) {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [lightboxOpen, currentImage]);
+  }, [lightboxOpen, currentImage, nextImage, prevImage]);
 
   if (!listing) {
     return (
@@ -75,20 +81,10 @@ export default function ListingDetailsClient({ id }: { id: string }) {
     setLightboxOpen(true);
   };
 
-  const nextImage = () => {
-    setCurrentImage((prev) => (prev + 1) % listing.images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImage(
-      (prev) => (prev - 1 + listing.images.length) % listing.images.length
-    );
-  };
-
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+      <TenantSidebar />
 
       {/* Main Content */}
       <main className="flex-1 py-8 px-6 overflow-y-auto">
@@ -148,10 +144,11 @@ export default function ListingDetailsClient({ id }: { id: string }) {
                   className="overflow-hidden rounded-xl shadow-sm hover:scale-105 transform transition cursor-pointer"
                   onClick={() => openLightbox(idx)}
                 >
-                  <img
+                  <Image
                     src={img}
                     alt={`${listing.title} ${idx + 1}`}
                     className="w-full h-full object-cover"
+                    width={400} height={300}
                   />
                 </div>
               ))}
@@ -249,10 +246,11 @@ export default function ListingDetailsClient({ id }: { id: string }) {
                   key={sim.id}
                   className="snap-center flex-shrink-0 w-72 bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition group"
                 >
-                  <img
+                  <Image
                     src={sim.images[0]}
                     alt={sim.title}
                     className="w-full h-44 object-cover transform group-hover:scale-105 transition duration-500"
+                    width={300} height={200}
                   />
                   <div className="absolute top-3 left-3 bg-[#C81E1E] text-white text-sm px-3 py-1 rounded-full shadow-md">
                     {formatKES(sim.price)}
@@ -293,10 +291,11 @@ export default function ListingDetailsClient({ id }: { id: string }) {
           >
             <ChevronLeft className="w-10 h-10" />
           </button>
-          <img
+          <Image
             src={listing.images[currentImage]}
             alt="Property"
             className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl"
+            width={1200} height={800}
           />
           <button
             onClick={nextImage}

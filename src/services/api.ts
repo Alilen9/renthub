@@ -4,21 +4,6 @@ import toast from 'react-hot-toast';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 /**
- * Determines the appropriate login page URL based on the API endpoint.
- * @param endpoint - The API endpoint that was called.
- * @returns The path to the login page.
- */
-const getLoginPath = (endpoint: string): string => {
-    if (endpoint.includes('/landlord')) {
-        return '/auth/landlord/login';
-    }
-    if (endpoint.includes('/admin')) {
-        return '/admin/login';
-    }
-    return '/'; // Default for buyers
-};
-
-/**
  * A reusable fetch wrapper to centralize API calls, error handling, and authentication.
  * @param endpoint - The API endpoint to call (e.g., '/api/products').
  * @param options - The request options for the fetch call.

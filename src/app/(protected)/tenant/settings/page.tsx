@@ -46,8 +46,8 @@ export default function SettingsPage() {
       } else {
         throw new Error("Failed to fetch settings");
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError((err as Error).message);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -75,8 +75,8 @@ export default function SettingsPage() {
       } else {
         throw new Error(response.error || "Failed to update profile");
       }
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Error: ${(err as Error).message}`);
     }
   };
 
@@ -88,8 +88,8 @@ export default function SettingsPage() {
     try {
       await updateTenantNotification({ [name]: checked });
       // Optionally show a small success toast/message here instead of an alert
-    } catch (err: any) {
-      alert(`Error updating notification: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Error updating notification: ${(err as Error).message}`);
       // Revert state on error
       setNotifications({ ...notifications, [name]: !checked });
     }
@@ -112,8 +112,8 @@ export default function SettingsPage() {
       } else {
         throw new Error(response.message || "Failed to update password");
       }
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Error: ${(err as Error).message}`);
     }
   };
 

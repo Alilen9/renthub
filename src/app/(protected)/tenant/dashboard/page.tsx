@@ -27,11 +27,11 @@ type Notice = {
 };
 
 export default function TenantDashboard() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   // FIX 1: Define tenantId from the auth context
-  const tenantId = user?.id || "";
+  const tenantId = user?.id ? String(user.id) : "";
 
   const [showMap, setShowMap] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -46,7 +46,7 @@ export default function TenantDashboard() {
   const [apartments, setApartments] = useState<Apartment[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [savedProperties] = useState(() => listings.filter((l) => (l as any).saved));
+  const [savedProperties] = useState(() => listings.filter((l) => (l as unknown as { saved: boolean }).saved));
   const [applications] = useState([
     { id: "app1", property: "Riverwalk Lofts", status: "Pending" },
     { id: "app2", property: "Sunset Apartments", status: "Approved" },
@@ -196,7 +196,13 @@ export default function TenantDashboard() {
                       description={apartment.description}
                       price={apartment.price}
                       location={apartment.location}
-                      media={apartment.video_url || []}
+                      media={
+                        apartment.video_url
+                          ? [
+                              { url: apartment.video_url, type: "image", name: apartment.name },
+                            ]
+                          : []
+                      }
                     />
                   ))}
                 </div>

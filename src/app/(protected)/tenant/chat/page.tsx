@@ -30,6 +30,13 @@ export type MessageType = {
   created_at: string;
 };
 
+type ApiMessage = {
+  id: number;
+  user_id: number;
+  message: string;
+  created_at: string;
+};
+
 // --- Chat Components ---
 function ChatListItem({
   chat,
@@ -58,7 +65,7 @@ function ChatListItem({
       }`}
       onClick={onClick}
     >
-      <div // eslint-disable-line jsx-a11y/interactive-supports-focus
+      <div
         className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-md font-semibold flex-shrink-0 ${
           isActive ? "bg-[#C81E1E]" : "bg-gray-400"
         }`}
@@ -233,10 +240,9 @@ export default function TenantChatPage() {
       try {
         setLoadingChats(true);
         const rawChatList = await fetchTenantChats();
-        console.log("chats", chats);
-        setChats(chats); 
-        if (chats.length > 0) {
-          setActiveChatId(chats[0].id);
+        setChats(rawChatList as unknown as ChatListItemType[]);
+        if (rawChatList.length > 0) {
+          setActiveChatId(rawChatList[0].id);
         }
       } catch (err: unknown) {
         setError("Failed to load chats. Please refresh the page.");
@@ -256,7 +262,7 @@ export default function TenantChatPage() {
       try {
         setLoadingMessages(true);
         const chatDetails = await fetchChatMessages(activeChatId);
-        const messages: MessageType[] = chatDetails.messages.map((msg: any) => ({
+        const messages: MessageType[] = (chatDetails.messages as unknown as ApiMessage[]).map((msg) => ({
           id: msg.id,
           chat_id: chatDetails.id,
           sender_id: msg.user_id,
@@ -306,7 +312,7 @@ export default function TenantChatPage() {
     try {
       await replyToChat(activeChatId, content);
       const newMessages = await fetchChatMessages(activeChatId);
-      const messages: MessageType[] = newMessages.messages.map((msg: any) => ({
+      const messages: MessageType[] = (newMessages.messages as unknown as ApiMessage[]).map((msg) => ({
         id: msg.id,
         chat_id: newMessages.id,
         sender_id: msg.user_id,
