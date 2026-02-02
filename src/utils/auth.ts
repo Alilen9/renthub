@@ -3,12 +3,19 @@ export interface User {
   username: string;
   full_name?: string;
   email: string;
-  role: 'tenant' | 'landlord' | 'admin';
+  role: Role;
   company_name?: string;
   phone?: string;
   address?: string;
   is_verified?: boolean;
 }
+
+export type Role =
+  | "tenant"
+  | "landlord"
+  | "admin"
+  | "service_provider";
+
 
 export interface RegisterFormData {
   username: string;
@@ -56,5 +63,6 @@ export interface BuyerProfileUpdate {
 }
 
 export interface LoginCredentials { email: string; password: string; }
+
 
 

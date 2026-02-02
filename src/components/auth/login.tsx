@@ -4,9 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
+import { Role } from "@/utils/auth";
 
-// Define roles centrally
-type Role = "tenant" | "landlord" | "serviceProvider";
 
 export default function LoginForm({
   onForgot,
@@ -27,8 +26,10 @@ export default function LoginForm({
   const roleRoutes: Record<Role, string> = {
     tenant: "/tenant/dashboard",
     landlord: "/landlord/dashboard",
-    serviceProvider: "/spn/dashboard", // correct App Router path
+    admin: "/admin/dashboard",
+    service_provider: "/spn/dashboard",
   };
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

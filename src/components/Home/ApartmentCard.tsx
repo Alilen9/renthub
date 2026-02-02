@@ -16,7 +16,7 @@ export default function ApartmentCard({ apartment }: ApartmentCardProps) {
             <div className="p-4">
                 <h3 className="text-xl font-semibold mb-2 text-gray-800">{apartment.name}</h3>
                 <p className="text-gray-600 mb-2">{apartment.location}</p>
-                <p className="text-lg font-bold text-blue-600">Ksh {Number(apartment.price).toLocaleString()}/mo</p>
+                <p className="text-rose-600 font-bold mt-2">Ksh {Number(apartment.price).toLocaleString()}/mo</p>
             </div>
         </div>
     );

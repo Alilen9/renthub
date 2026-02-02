@@ -26,10 +26,10 @@ export default function FeaturedApartments() {
         <section className="py-16 bg-gray-50">
             <div className="max-w-6xl mx-auto px-4">
                 <h2 className="text-3xl font-bold text-center mb-8 text-black">
-                    Featured Apartments
+                    Featured Properties
                 </h2>
                 {loading ? (
-                    <p className="text-center text-gray-600">Loading apartments...</p>
+                    <p className="text-center text-gray-600">Loading properties...</p>
                 ) : apartments.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {apartments.map((apartment) => (
@@ -37,7 +37,7 @@ export default function FeaturedApartments() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-center text-gray-600">No featured apartments available at the moment.</p>
+                    <p className="text-center text-gray-600">No featured properties available at the moment.</p>
                 )}
             </div>
         </section>

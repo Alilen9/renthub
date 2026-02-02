@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginUser, registerUser, loginAdmin } from '@/services/authService';
-import { User, RegisterFormData, ApiUser, LoginCredentials } from '@/utils/auth';
+import { User, RegisterFormData, ApiUser, LoginCredentials, Role } from '@/utils/auth';
 
 // The LoginCredentials type should be defined in your auth types file,
 // but is included here for clarity if it's missing.
@@ -12,8 +12,8 @@ export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: LoginCredentials, role: 'tenant' | 'landlord' | 'admin', redirectUrl?: string | null) => Promise<{ success: boolean; error?: string; }>;
-  register: (formData: RegisterFormData, role: 'tenant' | 'landlord') => Promise<{ success: boolean; error?: string }>;
+  login: (credentials: LoginCredentials, role: Role, redirectUrl?: string | null) => Promise<{ success: boolean; error?: string; }>;
+  register: (formData: RegisterFormData, role: Role ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const setSession = (sessionToken: string, userData: ApiUser, role: 'tenant' | 'landlord' | 'admin') => {
+  const setSession = (sessionToken: string, userData: ApiUser, role: Role) => {
     const userInfo: User = {
         id: userData.id,
         username: userData.username || '',
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   };
 
-  const login = async (credentials: LoginCredentials, role: 'tenant' | 'landlord' | 'admin', redirectUrl?: string | null) => {
+  const login = async (credentials: LoginCredentials, role: Role, redirectUrl?: string | null) => {
     setIsLoading(true);
     try {
       const data = role === 'admin'
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (formData: RegisterFormData, role: 'tenant' | 'landlord') => {
+  const register = async (formData: RegisterFormData, role: Role) => {
 
     try {
       setIsLoading(true);
@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    const role = user?.role; // Get role before clearing user state
+    let role = user?.role; // Get role before clearing user state
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('verificationBannerDismissed'); // Clear banner state on logout
@@ -123,7 +123,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     
     let loginPath = '/';
-    if (role === 'landlord') {
+    if (role = 'landlord') {
       loginPath = '/';
     } else if (role === 'admin') {
       loginPath = '/';

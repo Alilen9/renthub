@@ -1,8 +1,8 @@
-import { ResetPasswordResponse, ChangePasswordData, RegisterSuccessResponse } from './../utils/auth';
+import { ResetPasswordResponse, ChangePasswordData, RegisterSuccessResponse, Role } from './../utils/auth';
 import { LoginSuccessResponse, RegisterFormData, LoginCredentials } from "@/utils/auth";
 import { apiFetch } from '@/services/api';
 
-export const loginUser = async (credentials: LoginCredentials, role: 'tenant' | 'landlord'): Promise<LoginSuccessResponse> => {
+export const loginUser = async (credentials: LoginCredentials, role: Role): Promise<LoginSuccessResponse> => {
   const endpoint = '/api/auth/login';
   return apiFetch<LoginSuccessResponse>(endpoint, {
     method: 'POST',
@@ -18,7 +18,7 @@ export const loginAdmin = async (credentials: LoginCredentials): Promise<LoginSu
   }, false);
 };
 
-export const registerUser = async (formData: RegisterFormData, role: 'tenant' | 'landlord'): Promise<RegisterSuccessResponse> => {
+export const registerUser = async (formData: RegisterFormData, role: Role): Promise<RegisterSuccessResponse> => {
   const endpoint = role === 'tenant' ? '/api/auth/register/tenant' : '/api/auth/register';
   const body = {
     username: formData.email, // Using email as username for simplicity
@@ -91,34 +91,5 @@ export const updatePassword = async (
     body: JSON.stringify(payload),
   });
 };
-// export const loginUser = async (
-//   credentials: LoginCredentials,
-//   role: "tenant" | "landlord"
-// ): Promise<LoginSuccessResponse> => {
-//   await new Promise((resolve) => setTimeout(resolve, 800));
 
-//   // ✅ Allow any email/password combination
-//   return {
-//     token: "mock-token-123",
-//     user: { email: credentials.email, role },
-//   };
-// };
-
-// export const registerUser = async (): Promise<RegisterSuccessResponse> => {
-//   await new Promise((resolve) => setTimeout(resolve, 800));
-//   return { message: "Registered successfully (mock)" };
-// };
-
-// export const requestPasswordReset = async (
-//   email: string,
-//   role: "tenant" | "landlord"
-// ): Promise<ResetPasswordResponse> => {
-//   await new Promise((resolve) => setTimeout(resolve, 800));
-//   return { message: `Password reset email sent to ${email} (${role})` };
-// };
-
-// export const resetPassword = async (): Promise<ResetPasswordResponse> => {
-//   await new Promise((resolve) => setTimeout(resolve, 800));
-//   return { message: "Password reset successful (mock)" };
-// };
 

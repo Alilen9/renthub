@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, ShieldCheck, MessageCircle, CreditCard, MapPin } from "lucide-react";
+import FeaturedApartments from "./FeaturedApartments";
+import { ContactUsFormData } from "@/utils/contactUs";
+import { sendContactInquiry } from "@/services/contactService";
 
 // Hero city images
 const cityImages = [
@@ -30,6 +33,8 @@ const features = [
 export default function LandingPage() {
   const [index, setIndex] = useState(0);
   const [properties, setProperties] = useState(sampleProperties);
+  const [contactForm, setContactForm] = useState<ContactUsFormData>({ full_name: "", email: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Hero background cycling
   useEffect(() => {
@@ -84,25 +89,7 @@ export default function LandingPage() {
 
       {/* Properties Section */}
       <section id="properties" className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-black mb-8 text-center">Featured Properties</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {properties.map((prop) => (
-              <Link
-                key={prop.id}
-                href="/landlord/property"
-                className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer transform hover:-translate-y-1"
-              >
-                <img src={prop.image} alt={prop.title} className="w-full h-48 object-cover" />
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-black">{prop.title}</h3>
-                  <p className="text-gray-600">{prop.location}</p>
-                  <p className="text-rose-600 font-bold mt-2">Ksh {prop.price.toLocaleString()}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+        <FeaturedApartments/>
       </section>
 
       {/* Services Section */}
@@ -165,39 +152,59 @@ export default function LandingPage() {
               <p className="text-gray-800"><strong>Address:</strong> Nairobi, Kenya</p>
             </div>
 
-            {/* Contact Form */}
            {/* Contact Form */}
-<form
-  onSubmit={(e) => {
-    e.preventDefault();
-    alert("✅ Inquiry sent successfully!");
-  }}
-  className="bg-gray-50 p-6 rounded-2xl shadow-md flex flex-col space-y-4"
->
-  <input
-    type="text"
-    placeholder="Your Name"
-    required
-    className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-600 text-black"
-  />
-  <input
-    type="email"
-    placeholder="Your Email"
-    required
-    className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-600 text-black"
-  />
-  <textarea
-    placeholder="Your Message"
-    required
-    className="border border-gray-300 rounded-md px-4 py-2 h-32 focus:outline-none focus:ring-2 focus:ring-rose-600 text-black"
-  />
-  <button
-    type="submit"
-    className="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md transition"
-  >
-    Send Message
-  </button>
-</form>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(contactForm.email)) {
+                  alert("Please enter a valid email address.");
+                  return;
+                }
+                setIsSubmitting(true);
+                try {
+                  await sendContactInquiry(contactForm);
+                  alert(`✅ Inquiry sent successfully!\n\nName: ${contactForm.full_name}\nEmail: ${contactForm.email}`);
+                  setContactForm({ full_name: "", email: "", message: "" });
+                } catch (error) {
+                  alert("Failed to send inquiry. Please try again.");
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+              className="bg-gray-50 p-6 rounded-2xl shadow-md flex flex-col space-y-4"
+            >
+              <input
+                type="text"
+                placeholder="Your Name"
+                value={contactForm.full_name}
+                onChange={(e) => setContactForm({ ...contactForm, full_name: e.target.value })}
+                required
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-600 text-black"
+              />
+              <input
+                type="email"
+                placeholder="Your Email"
+                value={contactForm.email}
+                onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                required
+                className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-600 text-black"
+              />
+              <textarea
+                placeholder="Your Message"
+                value={contactForm.message}
+                onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                required
+                className="border border-gray-300 rounded-md px-4 py-2 h-32 focus:outline-none focus:ring-2 focus:ring-rose-600 text-black"
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md transition disabled:bg-rose-400"
+              >
+                {isSubmitting ? "Sending..." : "Send Message"}
+              </button>
+            </form>
 
           </div>
         </div>
