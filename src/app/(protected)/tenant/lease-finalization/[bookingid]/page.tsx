@@ -181,7 +181,7 @@ export default function LeaseFinalizationPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <TenantSidebar activeMenu="Finalize Move-in" setActiveMenu={() => {}} />
+      
       <main className="flex-1 p-10 overflow-y-auto">
         {releaseSuccess ? (
           <div className="min-h-[80vh] flex flex-col items-center justify-center bg-green-50 rounded-2xl border border-green-300 shadow-lg">

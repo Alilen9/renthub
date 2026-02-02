@@ -40,7 +40,6 @@ type Tenant = {
 // --- Main Page ---
 export default function TenantNotices() {
   const [notices, setNotices] = useState<Notice[]>([]);
-  const [isTenant, setIsTenant] = useState<boolean | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [tenant, setTenant] = useState<Tenant | null>({
     id: "tenant_1",
@@ -77,42 +76,12 @@ export default function TenantNotices() {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+     
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Step 1: Ask if user is a tenant */}
-        {isTenant === null && (
-          <div className="flex flex-col justify-center items-center min-h-full text-black">
-            <h2 className="text-2xl font-bold mb-4">Are you a tenant?</h2>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setIsTenant(true)}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => setIsTenant(false)}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Not a tenant */}
-        {isTenant === false && (
-          <div className="flex flex-col justify-center items-center min-h-full text-black">
-            <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-            <p>You must be a tenant to access this page.</p>
-          </div>
-        )}
-
+      <div className="flex-1 p-4 md:p-6 w-full max-w-7xl mx-auto">
         {/* Step 3: Select Property */}
-        {isTenant && !selectedProperty && (
+        {!selectedProperty && (
           <div className="flex flex-col justify-center items-center min-h-full text-black">
             <h2 className="text-2xl font-bold mb-4">Select Your Property</h2>
             <div className="flex flex-col gap-3">
@@ -142,7 +111,7 @@ export default function TenantNotices() {
 
         {/* Step 5: Notices Dashboard */}
         {selectedProperty && selectedProperty.managerApproved && (
-          <div className="max-w-6xl mx-auto">
+          <div className="w-full">
             <h1 className="text-3xl font-bold text-[#58181C] mb-8">Tenant Notices</h1>
 
             {notices.length === 0 && (

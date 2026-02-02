@@ -20,7 +20,7 @@ export default function BookingPage() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+      {/* <TenantSidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} /> */}
 
       {/* Main Content */}
       <div className="flex-1 p-6">

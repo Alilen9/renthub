@@ -1,67 +1,95 @@
-// MOCK AUTH SERVICE — offline testing version
+import { ResetPasswordResponse, ChangePasswordData, RegisterSuccessResponse, Role } from './../utils/auth';
+import { LoginSuccessResponse, RegisterFormData, LoginCredentials } from "@/utils/auth";
+import { apiFetch } from '@/services/api';
 
-interface LoginCredentials {
-  email: string;
-  password: string;
-}
+export const loginUser = async (credentials: LoginCredentials, role: Role): Promise<LoginSuccessResponse> => {
+  const endpoint = '/api/auth/login';
+  return apiFetch<LoginSuccessResponse>(endpoint, {
+    method: 'POST',
+    body: JSON.stringify({ ...credentials, role }),
+  }, false);
+};
 
-// ✅ Add serviceProvider to allowed roles
-type Role = "tenant" | "landlord" | "serviceProvider";
+export const loginAdmin = async (credentials: LoginCredentials): Promise<LoginSuccessResponse> => {
+  const endpoint = '/api/admin/login';
+  return apiFetch<LoginSuccessResponse>(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  }, false);
+};
 
-interface LoginSuccessResponse {
+export const registerUser = async (formData: RegisterFormData, role: Role): Promise<RegisterSuccessResponse> => {
+  const endpoint = role === 'tenant' ? '/api/auth/register/tenant' : '/api/auth/register';
+  const body = {
+    username: formData.email, // Using email as username for simplicity
+    full_name: formData.full_name,
+    email: formData.email,
+    password: formData.password,
+    phone: formData.phone,
+    address: formData.address,
+    business_name: formData.company_name,
+  };
+
+  return apiFetch<RegisterSuccessResponse>(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  }, false);
+
+};
+/**
+ * Sends a request to the server to initiate a password reset process.
+ * @param email The user's email address.
+ * @param role The user's role, either 'tenant' or 'landlord'.
+ * @returns A promise that resolves with the success message from the server.
+ */
+export const requestPasswordReset = async (email: string, role: 'tenant' | 'landlord'): Promise<ResetPasswordResponse> => {
+  const endpoint = `/api/auth/forgot-password/${role}`;
+
+  const body = {
+    email: email,
+  };
+  return apiFetch<ResetPasswordResponse>(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  }, false);
+  
+};
+
+interface ResetPasswordPayload {
   token: string;
-  user: {
-    email: string;
-    role: Role;
-  };
+  password: string;
+  role: 'tenant' | 'landlord';
 }
 
-interface RegisterSuccessResponse {
-  message: string;
-}
-
-interface ResetPasswordResponse {
-  message: string;
-}
-
-export const loginUser = async (
-  credentials: LoginCredentials,
-  role: Role
-): Promise<LoginSuccessResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  // ✅ Allow any email/password combination
-  return {
-    token: "mock-token-123",
-    user: { email: credentials.email, role },
-  };
-};
-
-export const registerUser = async (
-  p0: {
-    username: string;
-    full_name: string;
-    email: string;
-    password: string;
-    phone?: string;
-    address?: string;
-    company_name?: string;
-  },
-  p1: Role
-): Promise<RegisterSuccessResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  return { message: "Registered successfully (mock)" };
-};
-
-export const requestPasswordReset = async (
-  email: string,
-  role: Role
+/**
+ * Sends a request to the server to reset the user's password.
+ * @param payload The reset token and new password.
+ * @returns A promise that resolves with the success message from the server.
+ */
+export const resetPassword = async (
+  payload: ResetPasswordPayload
 ): Promise<ResetPasswordResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  return { message: `Password reset email sent to ${email} (${role})` };
+  // The role is now part of the payload
+  const endpoint = '/api/auth/reset-password';
+  
+  return apiFetch<ResetPasswordResponse>(endpoint, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }, false);
 };
 
-export const resetPassword = async (): Promise<ResetPasswordResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  return { message: "Password reset successful (mock)" };
+/**
+ * Sends a request to update the current user's password.
+ * @param payload The current and new password.
+ * @returns A promise that resolves with the success message from the server.
+ */
+export const updatePassword = async (
+  payload: ChangePasswordData
+): Promise<RegisterSuccessResponse> => {
+  return apiFetch<RegisterSuccessResponse>('/api/auth/update-password', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
 };
+
+

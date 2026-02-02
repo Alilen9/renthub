@@ -11,7 +11,6 @@ export type ListingFile = {
   size?: number;
 };
 
-
 export type ListingDraft = {
   id?: string; 
   county: string | number | readonly string[] | undefined;
@@ -25,7 +24,9 @@ export type ListingDraft = {
   media: Array<{ url?: string; name?: string; type: "image" | "video" | "360"; size?: number }>;
   visibility?: "local" | "national" | "international";
   package?: "free" | "standard" | "premium";
+  is_active: boolean;
 };
+
 
 export type Message = {
   id: string;
@@ -39,5 +40,5 @@ export interface Listing {
   description: string;
   price: string;
   location: string;
-  files?: (File | ListingFile)[];
+  image_urls?: string[];
 }

@@ -3,11 +3,11 @@
 import { useState, useRef, JSX } from "react";
 import { toast } from "react-hot-toast";
 import { registerUser } from "@/services/authService";
-import { RegisterFormData } from "@/utils/auth";
+import { RegisterFormData, Role } from "@/utils/auth";
 import { FiCamera, FiUpload, FiCheckCircle, FiCreditCard, FiUser } from "react-icons/fi";
 import { motion } from "framer-motion";
 
-type RoleType = "tenant" | "landlord" | "serviceProvider";
+
 type KycStep = 1 | 2 | 3;
 
 export default function SignupForm({
@@ -17,7 +17,7 @@ export default function SignupForm({
   onLogin: () => void;
   onSuccess: () => void;
 }) {
-  const [role, setRole] = useState<RoleType>("tenant");
+  const [role, setRole] = useState<Role>("tenant");
   const [kycStep, setKycStep] = useState<KycStep | 0>(0);
   const [underReview, setUnderReview] = useState(false);
   const [formData, setFormData] = useState<RegisterFormData>({
@@ -38,6 +38,7 @@ export default function SignupForm({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Start camera
   const startCamera = async () => {
     try {
       setUseCamera(true);
@@ -72,14 +73,26 @@ export default function SignupForm({
     }
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (!file) {
       toast.error("Please upload or capture your document.");
       return;
     }
-    setFile(null); // clear for next step
-    if (kycStep < 3) setKycStep((prev) => (prev + 1) as KycStep);
-    else setUnderReview(true);
+    
+    if (kycStep < 3) {
+      setFile(null); // clear for next step
+      setKycStep((prev) => (prev + 1) as KycStep);
+    } else {
+      setIsLoading(true);
+      try {
+        await registerUser({ ...formData, username: formData.email }, role);
+        setUnderReview(true);
+      } catch (err: any) {
+        toast.error(err.message || "Registration failed.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -273,7 +286,7 @@ export default function SignupForm({
             type="radio"
             value="tenant"
             checked={role === "tenant"}
-            onChange={(e) => setRole(e.target.value as RoleType)}
+            onChange={(e) => setRole(e.target.value as Role)}
           />
           Tenant
         </label>
@@ -282,7 +295,7 @@ export default function SignupForm({
             type="radio"
             value="landlord"
             checked={role === "landlord"}
-            onChange={(e) => setRole(e.target.value as RoleType)}
+            onChange={(e) => setRole(e.target.value as Role)}
           />
           Landlord
         </label>
@@ -290,8 +303,8 @@ export default function SignupForm({
           <input
             type="radio"
             value="serviceProvider"
-            checked={role === "serviceProvider"}
-            onChange={(e) => setRole(e.target.value as RoleType)}
+            checked={role === "service_provider"}
+            onChange={(e) => setRole(e.target.value as Role)}
           />
           Service Provider
         </label>
@@ -302,11 +315,7 @@ export default function SignupForm({
         disabled={isLoading}
         className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-300"
       >
-        {isLoading
-          ? "Creating..."
-          : role === "tenant"
-          ? "Create Account"
-          : "Continue to Verification"}
+        {isLoading ? 'Creating...' : ('Create Account')}
       </button>
 
       <p className="text-sm text-center text-black">

@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser } from "@/services/authService";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
+import { Role } from "@/utils/auth";
 
-// Define roles centrally
-type Role = "tenant" | "landlord" | "serviceProvider";
 
 export default function LoginForm({
   onForgot,
@@ -19,6 +18,7 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("tenant");
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const router = useRouter();
 
@@ -26,8 +26,10 @@ export default function LoginForm({
   const roleRoutes: Record<Role, string> = {
     tenant: "/tenant/dashboard",
     landlord: "/landlord/dashboard",
-    serviceProvider: "/spn/dashboard", // correct App Router path
+    admin: "/admin/dashboard",
+    service_provider: "/spn/dashboard",
   };
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,16 +40,16 @@ export default function LoginForm({
     setIsLoading(true);
 
     try {
-      const data = await loginUser({ email, password }, role);
+      const result = await login({ email, password }, role);
 
-      toast.success("Logged in successfully!");
+      if (result.error) {
+        toast.error(result.error || 'Login failed. Please check your credentials.');
+      } else {
+        toast.success('Login successful!');
+      }
 
-      // Store token and user info
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      console.log("Login result", result)
 
-      // Redirect based on role
-      router.push(roleRoutes[role]);
     } catch (err: any) {
       toast.error(err.message || "An unexpected error occurred.");
     } finally {

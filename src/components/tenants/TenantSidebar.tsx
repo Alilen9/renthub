@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import React from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FiHome,
   FiMessageSquare,
   FiSettings,
-  FiLogOut,
   FiKey,
   FiCalendar,
   FiAlertCircle,
@@ -15,13 +16,17 @@ import {
   FiBell,
 } from "react-icons/fi";
 
+import { colors } from "@/utils/colors";
+
+// ---------------- Sidebar ----------------
 type SidebarProps = {
   activeMenu: string;
   setActiveMenu: (menu: string) => void;
 };
 
-function TenantSidebar({ activeMenu, setActiveMenu }: SidebarProps) {
+function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const menuItems = [
     { name: "Dashboard", icon: <FiHome />, path: "/tenant/dashboard" },
@@ -33,56 +38,35 @@ function TenantSidebar({ activeMenu, setActiveMenu }: SidebarProps) {
     { name: "Complain", icon: <FiAlertTriangle />, path: "/tenant/complain" },
     { name: "TenantAnalytics", icon: <FiBarChart2 />, path: "/tenant/TenantAnalytics" },
     { name: "Fairnesspolicy", icon: <FiFile />, path: "/tenant/fairness" },
-
-
- { name: "Settings", icon: <FiSettings />, path: "/tenant/settings" },
-    
-
-   
+    { name: "Settings", icon: <FiSettings />, path: "/tenant/settings" },
   ];
 
-  const handleClick = (item: typeof menuItems[0]) => {
-    setActiveMenu(item.name);
-    router.push(item.path);
-  };
-
   return (
-    <aside className="w-64 min-h-screen flex flex-col bg-white shadow-md">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-[#C81E1E]">RentHub</h1>
-        <p className="text-sm text-gray-500 mt-1">Your Rental Dashboard</p>
-      </div>
-
-      {/* Menu */}
-      <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => (
-          <button
+    <nav
+      className="flex-1 space-y-1 py-4"
+      style={{ backgroundColor: colors.maroon }}
+    >
+      {menuItems.map((item) => {
+        const isActive = pathname === item.path;
+        return (
+          <Link
             key={item.name}
-            onClick={() => handleClick(item)}
-            className={`flex items-center gap-3 w-full p-3 rounded-lg font-medium transition
-              ${activeMenu === item.name
-                ? "bg-[#C81E1E] text-white shadow-md"
-                : "text-gray-700 hover:bg-[#C81E1E]/10 hover:text-[#C81E1E]"
-              }`}
+            href={item.path}
+            onClick={onLinkClick}
+            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-r-md transition-colors ${
+              isActive
+                ? "sidebar-btn border-r-2 border-blue-500 text-white bg-black/20"
+                : "text-gray-200 hover:bg-gray-50 hover:text-gray-900"
+            }`}
           >
-            {item.icon}
-            <span>{item.name}</span>
-          </button>
-        ))}
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200">
-        <button
-          className="flex items-center gap-3 w-full p-3 rounded-lg text-gray-700 hover:bg-red-100 hover:text-[#C81E1E] transition"
-          onClick={() => router.push("/")}
-        >
-          <FiLogOut />
-          <span>Logout</span>
-        </button>
-      </div>
-    </aside>
+            {React.cloneElement(item.icon, {
+              className: `mr-3 h-5 w-5 ${isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"}`,
+            })}
+            {item.name}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 

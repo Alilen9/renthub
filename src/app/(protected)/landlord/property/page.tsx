@@ -1,27 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ListingDraft, ListingFile } from "@/components/landlord/types";
+import { ListingFile } from "@/components/landlord/types";
 import ListingCard from "@/components/landlord/ListingCard";
+import { Apartment } from "@/utils";
+import { deleteHouse, fetchListings } from "@/services/houseService";
+import toast from "react-hot-toast";
 
 export default function PropertiesPage() {
-  const [listings, setListings] = useState<ListingDraft[]>([]);
+  const [listings, setListings] = useState<Apartment[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("listings");
-    if (saved) {
+    async function loadListings() {
       try {
-        setListings(JSON.parse(saved));
-      } catch (error) {
-        console.error("Error parsing listings from localStorage:", error);
+        const data = await fetchListings();
+        setListings(data);
+      } catch (err) {
+        console.error("Failed to fetch listings", err);
+        toast.error("Could not load your properties.");
+      } finally {
+        setLoading(false);
       }
     }
+    loadListings();
   }, []);
 
-  const handleDelete = (index: number) => {
-    const updated = listings.filter((_, i) => i !== index);
-    setListings(updated);
-    localStorage.setItem("listings", JSON.stringify(updated));
+  const handleDelete = async (id: string | number) => {
+    if (!confirm("Are you sure you want to delete this listing?")) return;
+
+    const idStr = String(id);
+    const originalListings = [...listings];
+    setListings(listings.filter((l) => String(l.id) !== idStr));
+    const { success, message } = await deleteHouse(idStr);
+    if (!success) {
+      toast.error(`Failed to delete: ${message}`);
+      setListings(originalListings);
+    } else {
+      toast.success("Listing deleted successfully.");
+    }
   };
 
   return (
@@ -33,7 +50,9 @@ export default function PropertiesPage() {
         </p>
       </div>
 
-      {listings.length === 0 ? (
+      {loading ? (
+        <p className="text-center text-gray-500">Loading your properties...</p>
+      ) : listings.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 bg-white rounded-xl shadow-sm">
           <img
             src="/empty-property.svg"
@@ -47,19 +66,17 @@ export default function PropertiesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {listings.map((listing, index) => (
+          {listings.map((listing) => (
             <ListingCard
-              key={index}
-              title={listing.title || "Untitled Listing"}
-              description={
-                typeof listing.type === "string"
-                  ? listing.type
-                  : "No description available"
-              }
+              key={listing.id}
+              title={listing.name || "Untitled Listing"}
+              description={listing.description || "No description available"}
               price={Number(listing.price) || 0}
-              location={String(listing.county ?? "Unknown")}
-              media={(listing.media as ListingFile[]) || []}
-              onDelete={() => handleDelete(index)}
+              location={listing.location ?? "Unknown"}
+              media={
+                (listing.image_urls?.map((url) => ({ url, type: "image" })) as ListingFile[]) || []
+              }
+              onDelete={() => handleDelete(listing.id)}
             />
           ))}
         </div>
