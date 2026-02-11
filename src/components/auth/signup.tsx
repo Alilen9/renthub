@@ -302,7 +302,7 @@ export default function SignupForm({
         <label className="flex items-center gap-2">
           <input
             type="radio"
-            value="serviceProvider"
+            value="service_provider"
             checked={role === "service_provider"}
             onChange={(e) => setRole(e.target.value as Role)}
           />

@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { createListing } from "@/services/houseService";
 
 export default function AddListingPage() {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
  
   const [form, setForm] = useState<ListingDraft>({
@@ -44,7 +45,7 @@ export default function AddListingPage() {
     setIsSubmitting(true);
     const formData = new FormData();
     formData.append("name", form.title.trim()); // The backend expects 'name'
-    formData.append("category", form.houseType);
+    formData.append("category", String(form.type || ""));
     formData.append("description", ""); // Assuming description comes from somewhere else or is optional
     formData.append("location", form.location.address);
     formData.append("price", form.price.toString());
@@ -53,6 +54,14 @@ export default function AddListingPage() {
     
     formData.append("is_active", form.is_active.toString() || 'true');
 
+    if (form.files && form.files.length > 0) {
+      form.files.forEach((file) => {
+        if (file instanceof File) {
+          formData.append("images", file);
+        }
+      });
+    }
+
     
     
     try {
@@ -60,21 +69,7 @@ export default function AddListingPage() {
 
       if (newProduct && newProduct.id) {
         toast.success("Product added successfully!");
-        //fetchProducts(); // Refresh the product list
-        
-        // Reset and close form
-        setForm({
-          title: "",
-          price: 0,
-          county: "",
-          type: "",
-          amenities: [],
-          files: [],
-          location: { lat: null, lng: null, address: "", county: "" },
-          houseType: "",
-          media: [],
-          is_active: true,
-        });
+        router.push("/landlord/property");
       } else {
         toast.error("Failed to create listing. The server did not return a valid response.");
       }

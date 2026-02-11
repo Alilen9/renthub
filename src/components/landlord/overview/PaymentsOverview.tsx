@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, ArrowRight } from "lucide-react";
+import { CreditCard, ArrowRight, RefreshCw } from "lucide-react";
+import { apiFetch } from "@/services/api";
 
 interface Payment {
   tenant: string;
@@ -13,21 +14,26 @@ interface Payment {
 
 export default function PaymentsOverview() {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("payments_overview");
-    if (saved) {
-      setPayments(JSON.parse(saved));
-    } else {
-      const defaults: Payment[] = [
-        { tenant: "John Doe", amount: 12000, date: "2025-11-01", property: "2BR Apartment" },
-        { tenant: "Jane Smith", amount: 10500, date: "2025-10-25", property: "Studio Ruiru" },
-      ];
-      setPayments(defaults);
-      localStorage.setItem("payments_overview", JSON.stringify(defaults));
+  const fetchPayments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await apiFetch<{ success: boolean; data: Payment[] }>("/api/payments");
+      if (res.success) {
+        setPayments(res.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch payments", error);
+    } finally {
+      setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col justify-between hover:shadow-lg transition-all duration-300">
@@ -37,13 +43,23 @@ export default function PaymentsOverview() {
           <CreditCard className="text-blue-600" />
           <h2 className="text-lg font-semibold text-gray-800">Recent Payments</h2>
         </div>
-        <button
-          onClick={() => router.push("/landlord/wallet/payments")}
-          className="text-sm text-blue-600 hover:underline flex items-center gap-1"
-        >
-          View All
-          <ArrowRight className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={fetchPayments}
+            disabled={loading}
+            className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            title="Refresh"
+          >
+            <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+          </button>
+          <button
+            onClick={() => router.push("/landlord/wallet/payments")}
+            className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+          >
+            View All
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Payments Table */}
@@ -58,7 +74,16 @@ export default function PaymentsOverview() {
             </tr>
           </thead>
           <tbody>
-            {payments.map((p, i) => (
+            {loading && payments.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-8 text-center text-gray-500">Loading payments...</td>
+              </tr>
+            ) : payments.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-8 text-center text-gray-500">No recent payments found.</td>
+              </tr>
+            ) : (
+              payments.map((p, i) => (
               <tr key={i} className="border-b last:border-none hover:bg-gray-50 transition">
                 <td className="py-2">{p.tenant}</td>
                 <td className="py-2 text-gray-600">{p.property || "—"}</td>
@@ -67,7 +92,8 @@ export default function PaymentsOverview() {
                 </td>
                 <td className="py-2 text-gray-500">{p.date}</td>
               </tr>
-            ))}
+            ))
+            )}
           </tbody>
         </table>
       </div>

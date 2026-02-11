@@ -41,6 +41,7 @@ export default function ListingCard({
               alt={primaryMedia.name}
               className="w-full h-full object-cover"
               width={400} height={200}
+              unoptimized
             />
           )
         ) : (

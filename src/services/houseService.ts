@@ -49,9 +49,21 @@ export async function fetchListings(limit?: number): Promise<Apartment[]> {
     }
 }
 
+export async function fetchLandlordProperties(): Promise<Apartment[]> {
+    const result = await apiFetch<{ data: RawApartment[] }>('/api/landlords/houses');
+    return result.data.map((apartment) => ({
+        ...apartment,
+        // Ensure image_urls is always an array
+        image_urls:
+            typeof apartment.image_urls === "string"
+                ? JSON.parse(apartment.image_urls)
+                : apartment.image_urls || [],
+    })) as Apartment[];
+}
+
 export const createListing = async (formData: FormData): Promise<Apartment> => {
   const data = await apiFetch<{ data: Apartment }>(
-    '/api/houses',
+    '/api/landlords/houses',
     {
       method: 'POST',
       body: formData,

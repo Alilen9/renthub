@@ -1,19 +1,59 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import { getLandlordProfile, updateLandlordProfile } from "@/services/landlordService";
+import React, { useState, useRef, useEffect } from "react";
+import toast from "react-hot-toast";
+
+interface SettingsForm {
+  name: string;
+  email: string;
+  phone: string;
+  password?: string;
+  confirmPassword?: string;
+  notifications: boolean;
+}
 
 export default function LandlordSettingsPage() {
-  const [form, setForm] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+254712345678",
+  const [form, setForm] = useState<SettingsForm>({
+    name: "",
+    email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     notifications: true,
   });
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profile = await getLandlordProfile();
+        setForm({
+          name: profile.full_name || "",
+          email: profile.email || "",
+          phone: profile.phone || "",
+          notifications: profile.notifications,
+          password: "",
+          confirmPassword: "",
+        });
+        if (profile.profile_image_url) {
+          setProfileImage(profile.profile_image_url);
+        }
+      } catch (error) {
+        toast.error("Failed to load profile settings.");
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -23,14 +63,44 @@ export default function LandlordSettingsPage() {
     }));
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("✅ Settings saved successfully (API connection coming soon)");
+    if (form.password && form.password !== form.confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    setIsSaving(true);
+    const toastId = toast.loading("Saving settings...");
+
+    const formData = new FormData();
+    formData.append("name", form.name);
+    formData.append("email", form.email);
+    formData.append("phone", form.phone);
+    formData.append("notifications", String(form.notifications));
+
+    if (form.password) {
+      formData.append("password", form.password);
+    }
+    if (profileImageFile) {
+      formData.append("profile_image", profileImageFile);
+    }
+
+    try {
+      await updateLandlordProfile(formData);
+      toast.success("Settings saved successfully!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save settings.");
+    } finally {
+      toast.dismiss(toastId);
+      setIsSaving(false);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setProfileImageFile(file);
       const reader = new FileReader();
       reader.onload = (ev) => {
         setProfileImage(ev.target?.result as string);
@@ -42,6 +112,35 @@ export default function LandlordSettingsPage() {
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
+
+  if (loading) {
+    return (
+      <div className="p-8 max-w-4xl mx-auto animate-pulse">
+        <h1 className="h-8 bg-gray-300 rounded w-1/3 mb-6"></h1>
+        <div className="bg-white shadow-md rounded-2xl p-6 space-y-8">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-28 h-28 rounded-full bg-gray-300"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/2 mt-2"></div>
+          </div>
+          <div>
+            <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="h-10 bg-gray-300 rounded-xl"></div>
+              <div className="h-10 bg-gray-300 rounded-xl"></div>
+              <div className="h-10 bg-gray-300 rounded-xl"></div>
+            </div>
+          </div>
+          <div>
+            <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="h-10 bg-gray-300 rounded-xl"></div>
+              <div className="h-10 bg-gray-300 rounded-xl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -141,6 +240,7 @@ export default function LandlordSettingsPage() {
                 value={form.password}
                 onChange={handleChange}
                 className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
+                placeholder="Leave blank to keep current"
               />
             </div>
 
@@ -152,6 +252,7 @@ export default function LandlordSettingsPage() {
                 value={form.confirmPassword}
                 onChange={handleChange}
                 className="w-full border rounded-xl px-4 py-2 mt-1 focus:ring-2 focus:ring-rose-500 outline-none text-black"
+                placeholder="Leave blank to keep current"
               />
             </div>
           </div>
@@ -180,9 +281,10 @@ export default function LandlordSettingsPage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-6 py-2 rounded-xl shadow-sm transition"
+            disabled={isSaving}
+            className="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-6 py-2 rounded-xl shadow-sm transition disabled:bg-rose-400 disabled:cursor-not-allowed"
           >
-            Save Changes
+            {isSaving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

@@ -1,43 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ListingFile } from "@/components/landlord/types";
 import ListingCard from "@/components/landlord/ListingCard";
 import { Apartment } from "@/utils";
-import { deleteHouse, fetchListings } from "@/services/houseService";
+import { deleteHouse, fetchLandlordProperties } from "@/services/houseService";
 import toast from "react-hot-toast";
+import ListingCardSkeleton from "@/components/landlord/ListingCardSkeleton";
+
 
 export default function PropertiesPage() {
   const [listings, setListings] = useState<Apartment[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function loadListings() {
-      try {
-        const data = await fetchListings();
-        setListings(data);
-      } catch (err) {
-        console.error("Failed to fetch listings", err);
-        toast.error("Could not load your properties.");
-      } finally {
-        setLoading(false);
-      }
+  const loadListings = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchLandlordProperties();
+      console.log("Fetched listings:", data);
+      setListings(data);
+    } catch (err) {
+      console.error("Failed to fetch listings", err);
+      toast.error("Could not load your properties.");
+    } finally {
+      setLoading(false);
     }
-    loadListings();
   }, []);
+
+  useEffect(() => {
+    loadListings();
+  }, [loadListings]);
 
   const handleDelete = async (id: string | number) => {
     if (!confirm("Are you sure you want to delete this listing?")) return;
 
     const idStr = String(id);
-    const originalListings = [...listings];
-    setListings(listings.filter((l) => String(l.id) !== idStr));
+    const toastId = toast.loading("Deleting listing...");
     const { success, message } = await deleteHouse(idStr);
+    toast.dismiss(toastId);
+
     if (!success) {
       toast.error(`Failed to delete: ${message}`);
-      setListings(originalListings);
     } else {
       toast.success("Listing deleted successfully.");
+      // Refetch the list from the server to ensure UI is in sync
+      loadListings();
     }
   };
 
@@ -51,7 +58,11 @@ export default function PropertiesPage() {
       </div>
 
       {loading ? (
-        <p className="text-center text-gray-500">Loading your properties...</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <ListingCardSkeleton key={i} />
+          ))}
+        </div>
       ) : listings.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500 bg-white rounded-xl shadow-sm">
           <img
