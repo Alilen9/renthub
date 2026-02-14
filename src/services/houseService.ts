@@ -49,6 +49,25 @@ export async function fetchListings(limit?: number): Promise<Apartment[]> {
     }
 }
 
+export async function searchListings(query: string): Promise<Apartment[]> {
+    const path = `/api/houses?q=${encodeURIComponent(query)}`;
+
+    try {
+        const result = await apiFetch<{ data: RawApartment[] }>(path);
+        return result.data.map((apartment) => ({
+            ...apartment,
+            // Ensure image_urls is always an array
+            image_urls:
+                typeof apartment.image_urls === "string"
+                    ? JSON.parse(apartment.image_urls)
+                    : apartment.image_urls || [],
+        })) as Apartment[];
+    } catch (error) {
+        console.error("Error searching listings:", error);
+        return []; // Return an empty array on error
+    }
+}
+
 export async function fetchLandlordProperties(): Promise<Apartment[]> {
     const result = await apiFetch<{ data: RawApartment[] }>('/api/landlords/houses');
     return result.data.map((apartment) => ({

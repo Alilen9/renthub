@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, ShieldCheck, MessageCircle, CreditCard, MapPin } from "lucide-react";
 import FeaturedApartments from "./FeaturedApartments";
 import { ContactUsFormData } from "@/utils/contactUs";
@@ -22,6 +23,8 @@ const features = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
   const [index, setIndex] = useState(0);
   const [contactForm, setContactForm] = useState<ContactUsFormData>({ full_name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,6 +36,12 @@ export default function LandingPage() {
     }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   return (
     <div className="relative font-sans">
@@ -59,8 +68,14 @@ export default function LandingPage() {
               type="text"
               placeholder="Search by Location, Budget, or Property Type"
               className="flex-1 px-5 py-3 text-gray-800 focus:outline-none text-sm md:text-base"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button className="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 px-6 py-3 text-white font-medium transition rounded-r-full">
+            <button
+              onClick={handleSearch}
+              className="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 px-6 py-3 text-white font-medium transition rounded-r-full"
+            >
               <Search className="w-5 h-5" />
               <span className="hidden sm:inline">Search</span>
             </button>
