@@ -233,8 +233,6 @@ export default function ComplaintsPage() {
 
   return (
     <div className="flex w-full min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <TenantSidebar  />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col p-4 gap-4">

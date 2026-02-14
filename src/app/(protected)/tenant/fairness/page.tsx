@@ -115,7 +115,6 @@ export default function FairnessPolicyFullPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-50 relative">
-      <TenantSidebar />
 
       <div className="flex-1 p-8 space-y-6">
         {/* Toast */}

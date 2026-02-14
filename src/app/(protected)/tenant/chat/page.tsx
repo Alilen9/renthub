@@ -240,9 +240,10 @@ export default function TenantChatPage() {
       try {
         setLoadingChats(true);
         const rawChatList = await fetchTenantChats();
-        setChats(rawChatList as unknown as ChatListItemType[]);
-        if (rawChatList.length > 0) {
-          setActiveChatId(rawChatList[0].id);
+        const safeChatList = (rawChatList || []) as unknown as ChatListItemType[];
+        setChats(safeChatList);
+        if (safeChatList.length > 0) {
+          setActiveChatId(safeChatList[0].id);
         }
       } catch (err: unknown) {
         setError("Failed to load chats. Please refresh the page.");

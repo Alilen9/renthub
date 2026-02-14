@@ -1,4 +1,5 @@
-import { getAuthToken } from './authHelper';
+import { getAuthToken } from "@/utils/authHelper";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 

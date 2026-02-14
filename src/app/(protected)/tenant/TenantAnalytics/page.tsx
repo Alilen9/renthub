@@ -39,7 +39,7 @@ const staffContacts = [
 const TenantAnalyticsPage = () => {
   return (
     <div className="flex text-black"> {/* Force all text inside to black */}
-      <TenantSidebar />
+
 
       <main className="flex-1 p-6 space-y-10 bg-gray-50 min-h-screen">
         <h1 className="text-3xl font-bold mb-6 text-black">Tenant Analytics Report</h1>
