@@ -1,7 +1,21 @@
-import { getAuthToken } from '@/utils/authHelper';
-import toast from 'react-hot-toast';
+import { getAuthToken } from './authHelper';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+/**
+ * Determines the appropriate login page URL based on the API endpoint.
+ * @param endpoint - The API endpoint that was called.
+ * @returns The path to the login page.
+ */
+const getLoginPath = (endpoint: string): string => {
+    if (endpoint.includes('/seller')) {
+        return '/auth/seller/login';
+    }
+    if (endpoint.includes('/admin')) {
+        return '/admin/login';
+    }
+    return '/login'; // Default for buyers
+};
 
 /**
  * A reusable fetch wrapper to centralize API calls, error handling, and authentication.
@@ -43,20 +57,10 @@ export const apiFetch = async <T>(
         if (!response.ok || (data && data.success === false)) {
             const errorMessage = data.error || data.message || `Request failed with status ${response.status}`;
 
-            // Check for various token-related error messages
-            const isAuthError = ['Invalid or expired token', 'Invaid or expired token', 'Not authorized, token failed', 'Request failed with status 401: Unauthorized'].some(
-                (msg) => errorMessage.includes(msg)
-            );
-
-            if (isAuthError) {
+            if (errorMessage.includes('Invalid or expired token') || errorMessage.includes('Invaid or expired token')) {
                 if (typeof window !== 'undefined') {
-                    toast.error("Your session has expired. Please log in again.");
-                    // Redirect to homepage after a short delay to allow the user to see the toast.
-                    setTimeout(() => {
-                        sessionStorage.clear(); // Clear session storage
-                        window.location.href = '/'; // Redirect to homepage
-                    }, 2000);
-                    throw new Error('Authentication error. Redirecting...');
+                    window.location.href = getLoginPath(endpoint);
+                    throw new Error('Authentication error. Redirecting to login...');
                 }
             }
             throw new Error(errorMessage);

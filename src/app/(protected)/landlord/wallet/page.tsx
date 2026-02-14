@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { formatCurrency } from "@/lib/currency";
-import { getPayments, getTransactions } from "@/lib/storage";
+import { getListings, getPayments, getTransactions } from "@/lib/storage";
 
 type Payment = {
   id: string;
@@ -29,18 +29,12 @@ type Transaction = {
   date: string;
 };
 
-type ChartDataPoint = {
-  name: string;
-  earnings: number;
-  withdrawals: number;
-};
-
 export default function WalletPage() {
   const [balance, setBalance] = useState(0);
   const [earnings, setEarnings] = useState(0);
   const [withdrawn, setWithdrawn] = useState(0);
   const [pending, setPending] = useState(0);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
     const payments: Payment[] = getPayments();
