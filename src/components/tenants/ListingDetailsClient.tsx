@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { listings } from "@/lib/mockData";
 import {
   Bed,
   MapPin,
@@ -13,10 +12,13 @@ import {
   User,
   Star,
   Home,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import TenantSidebar from "./TenantSidebar";
+import { fetchListingById, fetchApartments } from "@/services/houseService";
+import { Apartment } from "@/utils";
 
 
 const formatKES = (amount: number) =>
@@ -28,17 +30,40 @@ const formatKES = (amount: number) =>
   }).format(amount);
 
 export default function ListingDetailsClient({ id }: { id: string }) {
-  const listing = listings.find((l) => String(l.id) === id);
+  const [listing, setListing] = useState<Apartment | null>(null);
+  const [similarListings, setSimilarListings] = useState<Apartment[]>([]);
+  const [loading, setLoading] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
 
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchListingById(id);
+        setListing(data);
+
+        // Fetch recent apartments as "similar" for now
+        const all = await fetchApartments(6);
+        setSimilarListings(all.filter((l) => String(l.id) !== id));
+      } catch (error) {
+        console.error("Failed to load listing details", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [id]);
+
+  const images = listing?.image_urls || [];
+
   const nextImage = useCallback(() => {
-    if (listing) setCurrentImage((prev) => (prev + 1) % listing.images.length);
-  }, [listing]);
+    if (images.length > 0) setCurrentImage((prev) => (prev + 1) % images.length);
+  }, [images.length]);
 
   const prevImage = useCallback(() => {
-    if (listing) setCurrentImage((prev) => (prev - 1 + listing.images.length) % listing.images.length);
-  }, [listing]);
+    if (images.length > 0) setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -51,6 +76,14 @@ export default function ListingDetailsClient({ id }: { id: string }) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [lightboxOpen, currentImage, nextImage, prevImage]);
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <Loader2 className="w-10 h-10 animate-spin text-rose-600" />
+      </div>
+    );
+  }
+
   if (!listing) {
     return (
       <div className="p-10 text-center text-gray-600">
@@ -60,19 +93,16 @@ export default function ListingDetailsClient({ id }: { id: string }) {
   }
 
   // Pricing comparison
-  const sameAreaListings = listings.filter(
-    (l) => l.location === listing.location && l.id !== listing.id
-  );
+  // Simple average calculation based on fetched similar listings
   const avgPrice =
-    sameAreaListings.length > 0
-      ? sameAreaListings.reduce((sum, l) => sum + l.price, 0) /
-        sameAreaListings.length
-      : listing.price;
+    similarListings.length > 0
+      ? similarListings.reduce((sum, l) => sum + Number(l.price), 0) / similarListings.length
+      : Number(listing.price);
 
   const fairText =
-    listing.price < avgPrice
+    Number(listing.price) < avgPrice
       ? "✅ This property is cheaper than average for this area."
-      : listing.price > avgPrice
+      : Number(listing.price) > avgPrice
       ? "⚠️ This property is more expensive than average."
       : "ℹ️ This property is fairly priced for this area.";
 
@@ -102,15 +132,16 @@ export default function ListingDetailsClient({ id }: { id: string }) {
               Listings
             </Link>
             <span>/</span>
-            <span className="font-medium text-gray-800">{listing.title}</span>
+            <span className="font-medium text-gray-800">{listing.name}</span>
           </div>
 
           {/* Title + Price */}
           <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-800">
-                {listing.title}
-                {listing.verified && (
+                {listing.name}
+                {/* Assuming verified isn't in DB yet, or use listing.is_active */}
+                {true && (
                   <BadgeCheck className="w-6 h-6 text-[#F4C542]" />
                 )}
               </h1>
@@ -120,16 +151,16 @@ export default function ListingDetailsClient({ id }: { id: string }) {
               </p>
             </div>
             <span className="text-4xl font-extrabold text-[#C81E1E] mt-4 md:mt-0">
-              {formatKES(listing.price)}
+              {formatKES(Number(listing.price))}
             </span>
           </div>
 
           {/* Gallery */}
           <div className="grid md:grid-cols-2 gap-6 items-stretch">
-            {listing.virtualTourUrl && (
+            {listing.video_url && (
               <div className="rounded-2xl overflow-hidden shadow-md border border-gray-200 h-[350px]">
                 <iframe
-                  src={listing.virtualTourUrl}
+                  src={listing.video_url}
                   className="w-full h-full"
                   allow="fullscreen; vr"
                   loading="lazy"
@@ -138,7 +169,7 @@ export default function ListingDetailsClient({ id }: { id: string }) {
             )}
 
             <div className="grid grid-cols-2 gap-4 h-[350px]">
-              {listing.images.slice(0, 4).map((img, idx) => (
+              {images.slice(0, 4).map((img, idx) => (
                 <div
                   key={idx}
                   className="overflow-hidden rounded-xl shadow-sm hover:scale-105 transform transition cursor-pointer"
@@ -146,9 +177,10 @@ export default function ListingDetailsClient({ id }: { id: string }) {
                 >
                   <Image
                     src={img}
-                    alt={`${listing.title} ${idx + 1}`}
+                    alt={`${listing.name} ${idx + 1}`}
                     className="w-full h-full object-cover"
                     width={400} height={300}
+                    unoptimized
                   />
                 </div>
               ))}
@@ -173,13 +205,13 @@ export default function ListingDetailsClient({ id }: { id: string }) {
               <div className="flex items-center gap-3 bg-gray-100 p-4 rounded-xl shadow-sm">
                 <Bed className="w-6 h-6 text-[#C81E1E]" />
                 <span className="text-gray-800 font-medium">
-                  {listing.beds}
+                  {/* {listing.beds} Beds */} 3 Beds
                 </span>
               </div>
               <div className="flex items-center gap-3 bg-gray-100 p-4 rounded-xl shadow-sm">
                 <Square className="w-6 h-6 text-[#F4C542]" />
                 <span className="text-gray-800 font-medium">
-                  {listing.area}
+                  {/* {listing.area} */} 120 sqm
                 </span>
               </div>
               <div className="flex items-center gap-3 bg-gray-100 p-4 rounded-xl shadow-sm">
@@ -241,23 +273,24 @@ export default function ListingDetailsClient({ id }: { id: string }) {
               Similar properties nearby
             </h2>
             <div className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-              {sameAreaListings.slice(0, 5).map((sim) => (
+              {similarListings.slice(0, 5).map((sim) => (
                 <div
                   key={sim.id}
                   className="snap-center flex-shrink-0 w-72 bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition group"
                 >
                   <Image
-                    src={sim.images[0]}
-                    alt={sim.title}
+                    src={sim.image_urls?.[0] || "/placeholder.jpg"}
+                    alt={sim.name}
                     className="w-full h-44 object-cover transform group-hover:scale-105 transition duration-500"
                     width={300} height={200}
+                    unoptimized
                   />
                   <div className="absolute top-3 left-3 bg-[#C81E1E] text-white text-sm px-3 py-1 rounded-full shadow-md">
-                    {formatKES(sim.price)}
+                    {formatKES(Number(sim.price))}
                   </div>
                   <div className="p-4">
                     <h3 className="font-semibold text-gray-800">
-                      {sim.title}
+                      {sim.name}
                     </h3>
                     <p className="text-sm text-gray-500 mb-2">
                       {sim.location}
@@ -292,10 +325,11 @@ export default function ListingDetailsClient({ id }: { id: string }) {
             <ChevronLeft className="w-10 h-10" />
           </button>
           <Image
-            src={listing.images[currentImage]}
+            src={images[currentImage]}
             alt="Property"
             className="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl"
             width={1200} height={800}
+            unoptimized
           />
           <button
             onClick={nextImage}

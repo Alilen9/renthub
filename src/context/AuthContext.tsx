@@ -5,9 +5,6 @@ import { useRouter } from 'next/navigation';
 import { loginUser, registerUser, loginAdmin } from '@/services/authService';
 import { User, RegisterFormData, ApiUser, LoginCredentials, Role } from '@/utils/auth';
 
-// The LoginCredentials type should be defined in your auth types file,
-// but is included here for clarity if it's missing.
-
 export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;

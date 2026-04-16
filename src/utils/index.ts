@@ -1,4 +1,5 @@
 export interface Apartment {
+    is_active: any;
     id: number;
     name: string;
     description: string;

@@ -82,7 +82,7 @@ export async function fetchLandlordProperties(): Promise<Apartment[]> {
 
 export const createListing = async (formData: FormData): Promise<Apartment> => {
   const data = await apiFetch<{ data: Apartment }>(
-    '/api/landlords/houses',
+    '/api/houses',
     {
       method: 'POST',
       body: formData,
@@ -90,6 +90,23 @@ export const createListing = async (formData: FormData): Promise<Apartment> => {
   );
   return data.data;
 };
+
+export async function fetchListingById(id: string): Promise<Apartment | null> {
+    try {
+        const result = await apiFetch<{ data: RawApartment }>(`/api/houses/${id}`);
+        const apartment = result.data;
+        return {
+            ...apartment,
+            image_urls:
+                typeof apartment.image_urls === "string"
+                    ? JSON.parse(apartment.image_urls)
+                    : apartment.image_urls || [],
+        } as Apartment;
+    } catch (error) {
+        console.error(`Error fetching listing ${id}:`, error);
+        return null;
+    }
+}
 
 export const updateListing = async (id: string, formData: FormData): Promise<Apartment> => {
     const response = await apiFetch<{ data: Apartment }>(

@@ -45,7 +45,7 @@ export default function PropertyAccess({ listings, views = {} }: Props) {
             return (
               <Link
                 key={propertyId}
-                href={`/landlord/properties/${propertyId}`}
+                href={`/landlord/property/${propertyId}`}
                 className="block border rounded-lg p-4 hover:shadow-md transition relative"
               >
                 {/* View count badge */}

@@ -7,9 +7,9 @@ import PaymentsOverview from "./overview/PaymentsOverview";
 import PropertyAnalytics from "./overview/PropertyAnalytics";
 import PropertyAccess from "./overview/PropertyAccess";
 import TenantInquiries from "./overview/TenantInquiries";
-import { fetchLandlordProperties } from "@/services/houseService";
 import { Apartment } from "@/utils";
 import toast from "react-hot-toast";
+import { fetchLandlordProperties } from "@/services/houseService";
 
 export default function DashboardMain() {
   const router = useRouter();
