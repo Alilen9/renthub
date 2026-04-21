@@ -10,7 +10,7 @@ export interface ListingCardProps {
   description: string;
   price: number;
   location: string;
-  media: ListingFile[]; // ✅ changed from "files"
+  media: ListingFile[];
   onDelete?: () => void;
 }
 

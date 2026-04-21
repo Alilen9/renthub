@@ -74,7 +74,11 @@ export default function PropertiesPage() {
               price={Number(listing.price) || 0}
               location={listing.location ?? "Unknown"}
               media={
-                (listing.image_urls?.map((url) => ({ url, type: "image" })) as ListingFile[]) || []
+                (listing.image_urls || []).map((url, idx) => ({
+                  url,
+                  type: "image" as const,
+                  name: listing.name || `Property Image ${idx + 1}`
+                }))
               }
               onDelete={() => handleDelete(listing.id)}
             />

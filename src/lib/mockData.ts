@@ -15,7 +15,8 @@ export type Listing = {
   type?: string;
   virtualTourUrl?: string;
   landlordId?: string;
-  similarPropertyIds?: string[]; // ✅ Added
+  similarPropertyIds?: string[];
+  saved?: boolean; // ✅ Added for saved state
 };
 
 export const listings: Listing[] = [

@@ -9,8 +9,9 @@ import PropertyMap from "@/components/tenants/PropertyMap";
 import { useAuth } from "@/context/AuthContext";
 import { fetchApartments } from "@/services/houseService";
 import { Apartment } from "@/utils";
-import { Search } from "lucide-react";
-import ListingCard from "@/components/landlord/ListingCard";
+import { Search, Filter } from "lucide-react";
+import TenantListingCard from "@/components/tenants/ListingCard";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 
 // Define the types locally or import them
 type NoticeFile = { name: string; type: string; size: number; dataUrl?: string; };
@@ -30,11 +31,13 @@ export default function TenantDashboard() {
   const { user } = useAuth();
   const router = useRouter();
 
-  // FIX 1: Define tenantId from the auth context
   const tenantId = user?.id ? String(user.id) : "";
+
+  const { savedIds } = useSavedProperties();
 
   const [showMap, setShowMap] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<Filters>({
     location: "",
     budget: "",
@@ -45,8 +48,7 @@ export default function TenantDashboard() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [apartments, setApartments] = useState<Apartment[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const [savedProperties] = useState(() => listings.filter((l) => (l as unknown as { saved: boolean }).saved));
+
   const [applications] = useState([
     { id: "app1", property: "Riverwalk Lofts", status: "Pending" },
     { id: "app2", property: "Sunset Apartments", status: "Approved" },
@@ -93,14 +95,47 @@ export default function TenantDashboard() {
     loadApartments();
   }, []);
 
-  const filteredListings = listings.filter((listing) => {
-    if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
-    const maxBudget = Number(filters.budget);
-    if (maxBudget > 0 && listing.price > maxBudget) return false;
-    if (filters.type && listing.type !== filters.type) return false;
-    if (filters.verifiedOnly && !listing.verified) return false;
-    return true;
-  });
+  // Filter mock listings for map (has coordinates)
+  const filteredListings = useMemo(() => {
+    return listings.filter((listing) => {
+      if (filters.location && !listing.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+      const maxBudget = Number(filters.budget);
+      if (maxBudget > 0 && listing.price > maxBudget) return false;
+      if (filters.type && listing.type && !listing.type.toLowerCase().includes(filters.type.toLowerCase())) return false;
+      if (filters.verifiedOnly && !listing.verified) return false;
+      return true;
+    });
+  }, [filters]);
+
+  // Filter apartments based on all filters + search query
+  const filteredApartments = useMemo(() => {
+    return apartments.filter((apt) => {
+      // Search query (name or location)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesName = apt.name?.toLowerCase().includes(query);
+        const matchesLocation = apt.location?.toLowerCase().includes(query);
+        if (!matchesName && !matchesLocation) return false;
+      }
+      // Location filter
+      if (filters.location && !apt.location?.toLowerCase().includes(filters.location.toLowerCase())) {
+        return false;
+      }
+      // Budget filter
+      if (filters.budget && apt.price > Number(filters.budget)) {
+        return false;
+      }
+      // Property type filter (maps category to type)
+      if (filters.type) {
+        const aptCategory = apt.category?.toLowerCase() || "";
+        const filterType = filters.type.toLowerCase();
+        if (!aptCategory.includes(filterType)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [apartments, searchQuery, filters]);
 
   // FIX 3: Placeholder implementation to avoid crashes
   function toggleReadNotice(id: string): void {
@@ -113,37 +148,65 @@ export default function TenantDashboard() {
     <div className="flex min-h-screen bg-gray-100">
       <div className="flex-1 flex flex-col">
         <header className="flex justify-between items-center bg-white px-6 py-4 shadow-sm relative">
-          <div className="relative w-full max-w-xs">
+          {/* Search Bar */}
+          <div className="relative w-full max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="text"
-              placeholder="Search by name or area"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+              placeholder="Search by name or address..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent sm:text-sm transition"
             />
           </div>
-         
-          <div className="flex items-center space-x-3">
+
+          {/* Filter Button */}
+          <div className="flex items-center space-x-3 ml-4">
             <div className="relative">
               <button
                 onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${showFilterDropdown ? "bg-red-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                  showFilterDropdown
+                    ? "bg-red-600 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
+                }`}
               >
+                <Filter className="h-4 w-4" />
                 <span>Filters</span>
+                {[filters.location, filters.budget, filters.type, filters.verifiedOnly].filter(Boolean).length > 0 && (
+                  <span className="bg-white text-red-600 text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    {[filters.location, filters.budget, filters.type, filters.verifiedOnly].filter(Boolean).length}
+                  </span>
+                )}
               </button>
 
               {showFilterDropdown && (
-                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white border border-gray-200 rounded-lg shadow-xl p-4 z-50">
-                  <div className="mb-4">
-                    <SearchFilters onChange={setFilters} />
+                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
+                  <SearchFilters onChange={setFilters} />
+                  <div className="px-4 pb-4 flex gap-2">
+                    <button
+                      onClick={() => {
+                        setFilters({ location: "", budget: "", type: "", verifiedOnly: false });
+                        setSearchQuery("");
+                        setShowMap(false);
+                      }}
+                      className="flex-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md border border-gray-300 transition"
+                    >
+                      Clear All
+                    </button>
+                    <button
+                      onClick={() => setShowMap(!showMap)}
+                      className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition ${
+                        showMap
+                          ? "bg-gray-300 text-gray-800 hover:bg-gray-400 border border-gray-300"
+                          : "bg-red-600 text-white hover:bg-red-700 border border-transparent"
+                      }`}
+                    >
+                      {showMap ? "Hide Map" : "Show Map"}
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setShowMap(!showMap)}
-                    className={`flex items-center w-full justify-center px-4 py-2 rounded transition-colors ${showMap ? "bg-gray-300 text-gray-800 hover:bg-gray-400" : "bg-red-600 text-white hover:bg-red-700"}`}
-                  >
-                    {showMap ? "Hide Map View" : "Show Map View"}
-                  </button>
                 </div>
               )}
             </div>
@@ -163,11 +226,11 @@ export default function TenantDashboard() {
 
           {!isResident ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white p-6 rounded-lg shadow cursor-pointer hover:shadow-lg transition" onClick={() => router.push("/tenant/saved-properties")}>
-                  <h3 className="text-gray-500 font-medium">Saved Properties</h3>
-                  <p className="text-2xl font-bold text-red-700">{savedProperties.length}</p>
-                </div>
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                 <div className="bg-white p-6 rounded-lg shadow cursor-pointer hover:shadow-lg transition" onClick={() => router.push("/tenant/saved-properties")}>
+                   <h3 className="text-gray-500 font-medium">Saved Properties</h3>
+                   <p className="text-2xl font-bold text-red-700">{savedIds.length}</p>
+                 </div>
                 <div className="bg-white p-6 rounded-lg shadow cursor-pointer hover:shadow-lg transition" onClick={() => router.push("/tenant/applications")}>
                   <h3 className="text-gray-500 font-medium">Applications</h3>
                   <p className="text-2xl font-bold text-red-700">{applications.length}</p>
@@ -184,31 +247,36 @@ export default function TenantDashboard() {
                 </div>
               )}
 
-              <h3 className="text-lg font-semibold mb-4">Available Properties</h3>
-              {loading ? (
-                <p className="text-center text-gray-600">Loading apartments...</p>
-              ) : apartments.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {apartments.map((apartment) => (
-                    <ListingCard
-                      key={apartment.id}
-                      title={apartment.name}
-                      description={apartment.description}
-                      price={apartment.price}
-                      location={apartment.location}
-                      media={
-                        apartment.video_url
-                          ? [
-                              { url: apartment.video_url, type: "image", name: apartment.name },
-                            ]
-                          : []
-                      }
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-600">No apartments available at the moment.</p>
-              )}
+               <h3 className="text-lg font-semibold mb-4 flex items-center justify-between">
+                 Available Properties
+                 <span className="text-sm font-normal text-gray-500">
+                   {loading ? "" : `${filteredApartments.length} of ${apartments.length} properties`}
+                 </span>
+               </h3>
+               {loading ? (
+                 <p className="text-center text-gray-600">Loading apartments...</p>
+                ) : filteredApartments.length > 0 ? (
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                   {filteredApartments.map((apartment) => {
+                     const listing = {
+                       id: String(apartment.id),
+                       title: apartment.name,
+                       location: apartment.location,
+                       price: Number(apartment.price) || 0,
+                       images: Array.isArray(apartment.image_urls) ? apartment.image_urls : [],
+                       description: apartment.description,
+                     };
+                     return (
+                       <TenantListingCard
+                         key={apartment.id}
+                         listing={listing}
+                       />
+                     );
+                   })}
+                 </div>
+               ) : (
+                 <p className="text-center text-gray-600">No apartments match your criteria.</p>
+               )}
             </>
           ) : (
             <div className="bg-white p-6 rounded-lg shadow text-gray-600">

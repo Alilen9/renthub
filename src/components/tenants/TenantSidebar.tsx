@@ -16,8 +16,6 @@ import {
   FiBell,
 } from "react-icons/fi";
 
-import { colors } from "@/utils/colors";
-
 
 function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
   
@@ -37,10 +35,7 @@ function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
   ];
 
   return (
-    <nav
-      className="flex-1 space-y-1 py-4"
-      style={{ backgroundColor: colors.maroon }}
-    >
+    <nav className="flex-1 p-2 space-y-1 overflow-y-auto min-h-0">
       {menuItems.map((item) => {
         const isActive = pathname === item.path;
         return (
@@ -48,14 +43,14 @@ function TenantSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
             key={item.name}
             href={item.path}
             onClick={onLinkClick}
-            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-r-md transition-colors ${
+            className={`flex items-center gap-2 w-full p-2 rounded-lg text-sm font-medium transition ${
               isActive
-                ? "sidebar-btn border-r-2 border-blue-500 text-white bg-black/20"
-                : "text-gray-200 hover:bg-gray-50 hover:text-gray-900"
+                ? "bg-[#C81E1E] text-white shadow-md"
+                : "text-gray-700 hover:bg-[#C81E1E]/10 hover:text-[#C81E1E]"
             }`}
           >
             {React.cloneElement(item.icon, {
-              className: `mr-3 h-5 w-5 ${isActive ? "text-blue-500" : "text-gray-400 group-hover:text-gray-500"}`,
+              className: `h-4 w-4 ${isActive ? "text-black" : "text-gray-400 group-hover:text-gray-500"}`,
             })}
             {item.name}
           </Link>
