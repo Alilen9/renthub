@@ -133,6 +133,11 @@ export default function TenantDashboard() {
           return false;
         }
       }
+      // Verified filter - checks both is_verified and verified fields
+      if (filters.verifiedOnly) {
+        const isVerified = apt.is_verified || apt.verified;
+        if (!isVerified) return false;
+      }
       return true;
     });
   }, [apartments, searchQuery, filters]);
@@ -265,6 +270,7 @@ export default function TenantDashboard() {
                        price: Number(apartment.price) || 0,
                        images: Array.isArray(apartment.image_urls) ? apartment.image_urls : [],
                        description: apartment.description,
+                       verified: apartment.is_verified || apartment.verified,
                      };
                      return (
                        <TenantListingCard

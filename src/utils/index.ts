@@ -9,4 +9,6 @@ export interface Apartment {
     video_url?: string;
     landlord_username: string;
     business_name?: string;
+    is_verified?: boolean; // ✅ Added for verification status
+    verified?: boolean;   // ✅ Alias for frontend compatibility
 }

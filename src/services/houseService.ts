@@ -1,4 +1,4 @@
-
+ 
 import { Apartment } from "@/utils";
 import { apiFetch } from "./api";
 
@@ -29,6 +29,7 @@ export async function fetchApartments(limit?: number): Promise<Apartment[]> {
         return []; // Return an empty array on error
     }
 }
+
 export async function fetchListings(limit?: number): Promise<Apartment[]> {
     const path = limit ? `/api/houses?limit=${limit}` : "/api/houses";
 
@@ -46,6 +47,28 @@ export async function fetchListings(limit?: number): Promise<Apartment[]> {
     } catch (error) {
         console.error("Error fetching apartments:", error);
         return []; // Return an empty array on error
+    }
+}
+
+/**
+ * Fetches a single apartment by ID.
+ * @param id The apartment ID.
+ * @returns A promise that resolves to an apartment.
+ */
+export async function fetchApartmentById(id: string | number): Promise<Apartment | null> {
+    try {
+        const result = await apiFetch<{ data: RawApartment }>(`/api/houses/${id}`);
+        const apartment = result.data;
+        return {
+            ...apartment,
+            image_urls:
+                typeof apartment.image_urls === "string"
+                    ? JSON.parse(apartment.image_urls)
+                    : apartment.image_urls || [],
+        } as Apartment;
+    } catch (error) {
+        console.error("Error fetching apartment:", error);
+        return null;
     }
 }
 

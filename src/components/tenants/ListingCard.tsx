@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Heart } from "lucide-react";
+import { Heart, ShieldCheck } from "lucide-react";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 
 interface ListingCardProps {
@@ -12,6 +12,7 @@ interface ListingCardProps {
     price: number;
     images: string[];
     description?: string;
+    verified?: boolean;
   };
 }
 
@@ -48,14 +49,15 @@ export default function TenantListingCard({ listing }: ListingCardProps) {
             }`}
           />
         </button>
-        {/* Badges */}
-        <div className="absolute top-2 right-2 flex flex-col gap-1 items-end">
-          {listing.verified && (
-            <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded">
-              ✔ Verified
+        {/* Verified Badge - positioned left to avoid conflict with heart */}
+        {listing.verified && (
+          <div className="absolute top-2 left-2">
+            <span className="flex items-center gap-1 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full">
+              <ShieldCheck className="h-3 w-3" />
+              Verified
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Content */}
