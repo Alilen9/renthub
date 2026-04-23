@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ListingDraft } from "@/components/landlord/types";
 import ListingDetailsForm from "@/components/landlord/ListingDetailsForm";

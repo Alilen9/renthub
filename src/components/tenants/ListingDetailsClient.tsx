@@ -36,7 +36,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { fetchApartmentById, fetchApartments } from "@/services/houseService";
 import { Apartment } from "@/utils";
-import toast from "react-hot-toast";
 
 const formatKES = (amount: number) =>
   new Intl.NumberFormat("en-KE", {
@@ -162,7 +161,7 @@ export default function ListingDetailsClient({ id }: { id: string }) {
   const propertyFeatures = [
     { icon: <Wifi className="w-5 h-5" />, label: "High-Speed Wi-Fi" },
     { icon: <Car className="w-5 h-5" />, label: "Parking Space" },
-    { icon: <Shield className="w-5 w-5" />, label: "24/7 Security" },
+    { icon: <Shield className="w-5 h-5" />, label: "24/7 Security" },
     { icon: <Droplets className="w-5 h-5" />, label: "Hot Water" },
     { icon: <Flame className="w-5 h-5" />, label: "Cooking Gas" },
     { icon: <Wind className="w-5 h-5" />, label: "Air Conditioning" },
@@ -484,14 +483,6 @@ export default function ListingDetailsClient({ id }: { id: string }) {
             <p className="text-gray-600 mt-1">{fairText}</p>
           </div>
 
-          {/* Price Insights */}
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-            <p className="text-lg font-semibold text-gray-800">
-              Average rent in {listing.location}: <span className="text-[#C81E1E]">{formatKES(avgPrice)}</span>
-            </p>
-            <p className="text-gray-600 mt-1">{fairText}</p>
-          </div>
-
           {/* Landlord Info */}
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center gap-4">
             <User className="w-12 h-12 text-gray-400 border rounded-full p-2" />
@@ -508,11 +499,6 @@ export default function ListingDetailsClient({ id }: { id: string }) {
                   <Star key={i} className="w-4 h-4" fill={i < 4 ? "#F4C542" : "none"} />
                 ))}
               </div>
-            </div>
-            <Link href="/tenant/chat" className="px-4 py-2 bg-[#C81E1E] text-white rounded-lg font-medium shadow hover:bg-[#58181C] transition">
-              Contact
-            </Link>
-          </div>
             </div>
             <Link href="/tenant/chat" className="px-4 py-2 bg-[#C81E1E] text-white rounded-lg font-medium shadow hover:bg-[#58181C] transition">
               Contact

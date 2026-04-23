@@ -7,7 +7,6 @@ import {
   FiUsers,
   FiPhone,
 } from "react-icons/fi";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 // ---------------- Types ----------------
 export type ComplaintStatus = "Open" | "In Review" | "Resolved";
@@ -232,13 +231,13 @@ export default function ComplaintsPage() {
   if (!hydrated) return null; // Prevent SSR mismatch
 
   return (
-    <div className="flex w-full min-h-screen bg-gray-100">
+  <div className="flex w-full min-h-screen bg-gray-100">
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col p-4 gap-4">
-        <div className="min-h-[600px] h-full flex bg-white rounded-lg shadow overflow-hidden text-black">
-          {/* Left column */}
-          <div className="w-96 border-r p-4 bg-gray-50 flex flex-col gap-4">
+    {/* Main content */}
+    <div className="flex-1 flex flex-col p-4 gap-4">
+      <div className="min-h-[600px] h-full flex bg-white rounded-lg shadow overflow-hidden text-black">
+        {/* Left column */}
+        <div className={`${selectedId ? "hidden" : "flex"} lg:flex w-full lg:w-96 border-b lg:border-b-0 lg:border-r border-gray-200 p-4 bg-gray-50 flex-col gap-4`}>
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold" style={{ color: "#58181C" }}>Complaints</h2>
               <div className="text-sm text-gray-600">
@@ -246,15 +245,15 @@ export default function ComplaintsPage() {
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 lg:flex-row lg:gap-4">
               <input
-                className="flex-1 p-2 border border-gray-300 rounded-md text-black"
+                className="w-full lg:w-1/2 p-2 border border-gray-300 rounded-md text-black"
                 placeholder="Search by title or listing"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
               <select
-                className="p-2 border border-gray-300 rounded-md"
+                className="w-full lg:w-1/2 p-2 border border-gray-300 rounded-md"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as ComplaintStatus | "All")}
               >
@@ -345,18 +344,21 @@ export default function ComplaintsPage() {
           </div>
 
           {/* Right column */}
-          <div className="flex-1 flex flex-col">
+          <div className={`${selectedId ? "flex" : "hidden"} lg:flex flex-1 flex-col`}>
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-3">
-                <button className="p-2 rounded hover:bg-gray-100"><FiChevronLeft /></button>
-                <div>
+                <button 
+                  onClick={() => setSelectedId(null)}
+                  className="p-2 rounded hover:bg-gray-100 lg:hidden"
+                ><FiChevronLeft /></button>
+                <div className="min-w-0">
                   <div className="text-sm text-gray-600">Ticket</div>
                   <div className="font-bold text-black">{selected ? selected.title : "No complaint selected"}</div>
                   <div className="text-xs text-gray-500">{selected ? `${selected.type} · ${selected.listingTitle ?? "No listing"}` : "Select or create a complaint to view details."}</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2">
                 {selected && (
                   <>
                     <select value={selected.status} onChange={(e) => changeStatus(e.target.value as ComplaintStatus)} className="p-2 border border-gray-200 rounded">
@@ -364,47 +366,43 @@ export default function ComplaintsPage() {
                         <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
-                    <button onClick={() => escalateTo("Support")} className="px-3 py-2 bg-[#58181C] text-white rounded">Escalate to Support</button>
-                    <button onClick={() => escalateTo("Property Manager")} className="px-3 py-2 bg-[#F4C542] text-black rounded">Escalate to Manager</button>
+                    <button onClick={() => escalateTo("Support")} className="px-3 py-2 bg-[#58181C] text-white rounded text-sm">Escalate to Support</button>
+                    <button onClick={() => escalateTo("Property Manager")} className="px-3 py-2 bg-[#F4C542] text-black rounded text-sm">Escalate to Manager</button>
                     <button onClick={quickResolve} className="px-3 py-2 bg-green-600 text-white rounded">Resolve</button>
                   </>
                 )}
               </div>
             </div>
 
-            <div className="flex-1 flex overflow-hidden">
-              {/* Left: ticket meta */}
-              <div className="w-80 border-r p-4 bg-gray-50 overflow-y-auto">
-                {selected ? (
-                  <div className="space-y-3">
-                    <div><div className="text-xs text-gray-500">Status</div><div className="font-semibold text-black">{selected.status}</div></div>
-                    <div><div className="text-xs text-gray-500">Type</div><div className="font-semibold text-black">{selected.type}</div></div>
-                    <div><div className="text-xs text-gray-500">Escalated To</div><div className="font-semibold text-black">{selected.escalatedTo ?? "—"}</div></div>
-                    <div><div className="text-xs text-gray-500">Created</div><div className="font-semibold text-black">{new Date(selected.createdAt).toLocaleString()}</div></div>
-                    <div><div className="text-xs text-gray-500">Last Updated</div><div className="font-semibold text-black">{selected.updatedAt ? new Date(selected.updatedAt).toLocaleString() : "—"}</div></div>
-                  </div>
-                ) : <div className="text-sm text-gray-500">Select a complaint to view details.</div>}
-              </div>
-
-              {/* Right: messages */}
-              <div className="flex-1 flex flex-col">
-                <div className="flex-1 p-4 overflow-y-auto bg-white space-y-4">
-                  {selected ? (
-                    selected.messages.map((m) => (
-                      <div key={m.id} className={`flex ${m.sender === "tenant" ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[75%] p-3 rounded-lg shadow ${m.sender === "tenant" ? "bg-[#C81E1E] text-white rounded-br-none" : m.sender === "system" ? "bg-gray-100 text-gray-800" : "bg-gray-200 text-gray-900"}`}>
-                          <div className="text-sm">{m.text}</div>
-                          <div className="text-xs text-gray-400 mt-1">{m.timestamp}</div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-gray-400 text-sm">No messages yet.</div>
-                  )}
-                  <div ref={messagesEndRef}></div>
-                </div>
-
-                {selected && (
+            <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+               {/* Left: ticket meta */}
+               <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-gray-200 p-4 bg-gray-50 overflow-y-auto">
+                 {selected ? (
+                   <div className="space-y-3">
+                     <div><div className="text-xs text-gray-500">Status</div><div className="font-semibold text-black">{selected.status}</div></div>
+                     <div><div className="text-xs text-gray-500">Type</div><div className="font-semibold text-black">{selected.type}</div></div>
+                     <div><div className="text-xs text-gray-500">Escalated To</div><div className="font-semibold text-black">{selected.escalatedTo ?? "—"}</div></div>
+                     <div><div className="text-xs text-gray-500">Created</div><div className="font-semibold text-black">{new Date(selected.createdAt).toLocaleString()}</div></div>
+                     <div><div className="text-xs text-gray-500">Last Updated</div><div className="font-semibold text-black">{selected.updatedAt ? new Date(selected.updatedAt).toLocaleString() : "—"}</div></div>
+                   </div>
+                 ) : <div className="text-sm text-gray-500">Select a complaint to view details.</div>}
+               </div>
+               {/* Right: messages */}
+               <div className="flex-1 lg:w-full flex flex-col">
+                 <div className="flex-1 p-4 overflow-y-auto bg-white space-y-4">
+                   {selected && selected.messages.map((m) => (
+                       <div key={m.id} className={`flex ${m.sender === "tenant" ? "justify-end" : "justify-start"}`}>
+                         <div className={`max-w-[75%] p-3 rounded-lg shadow ${m.sender === "tenant" ? "bg-[#C81E1E] text-white rounded-br-none" : m.sender === "system" ? "bg-gray-100 text-gray-800" : "bg-gray-200 text-gray-900"}`}>
+                           <div className="text-sm">{m.text}</div>
+                           <div className="text-xs text-gray-400 mt-1">{m.timestamp}</div>
+                         </div>
+                       </div>
+                     ))}
+                   {!selected && <div className="text-gray-400 text-sm">No messages yet.</div>}
+                   <div ref={messagesEndRef}></div>
+                 </div>
+ 
+                 {selected && (
                   <div className="p-3 border-t flex gap-2">
                     <input
                       className="flex-1 p-2 border border-gray-300 rounded"

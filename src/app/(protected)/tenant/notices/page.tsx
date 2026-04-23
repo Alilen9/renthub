@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { FiFile } from "react-icons/fi";
 import Image from "next/image";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 // --- Notice Types ---
 type NoticeFile = {

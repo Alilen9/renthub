@@ -7,8 +7,6 @@ import FullPageLoader from '@/components/FullPageLoader';
 import { X, User, LogOut, Menu } from 'lucide-react';
 import TenantSidebar from '@/components/tenants/TenantSidebar';
 import { colors } from '@/utils/colors';
-import { Metadata } from 'next';
-
 
 
 

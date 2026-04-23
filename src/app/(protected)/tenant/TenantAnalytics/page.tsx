@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
 import {
   ResponsiveContainer,
   LineChart,

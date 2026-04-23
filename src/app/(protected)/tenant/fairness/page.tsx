@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
 import { 
   FiCheckCircle, FiClock, FiStar, FiMessageCircle, 
   FiPlay, FiTrash2, FiChevronDown, FiChevronUp 

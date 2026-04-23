@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return { success: false, error: 'Login successful, but no user data received.' };
       }
       setSession(data.token, userData, role);
-      console.log(userData)
+      
 
       if (redirectUrl && redirectUrl.startsWith('/')) {
         router.push(redirectUrl);

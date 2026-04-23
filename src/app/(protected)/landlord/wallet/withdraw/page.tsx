@@ -5,7 +5,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { addTransaction } from "@/lib/storage";
 import { v4 as uuid } from "uuid";
 import { useRouter } from "next/navigation";
-import { formatCurrency } from "@/lib/currency";
 
 export default function WithdrawPage() {
   const [amount, setAmount] = useState("");

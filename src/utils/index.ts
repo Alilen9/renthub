@@ -1,4 +1,9 @@
 export interface Apartment {
+    title: string;
+    beds: string;
+    area: string;
+    virtualTourUrl?: string;
+    type: string;
     id: number;
     name: string;
     description: string;

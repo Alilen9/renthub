@@ -6,7 +6,6 @@ import BookingReview from "@/components/tenants/BookingReview";
 import BookingPaymentEscrow from "@/components/tenants/BookingPaymentEscrow";
 import BookingProgressBar from "@/components/tenants/BookingProgressBar";
 import MoveInConfirmation from "@/components/tenants/MoveInConfirmation";
-import TenantSidebar from "@/components/tenants/TenantSidebar";
 
 export default function BookingPage() {
   const [step, setStep] = useState(1);
